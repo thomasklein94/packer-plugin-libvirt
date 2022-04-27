@@ -1,0 +1,5 @@
+main
+dist/*
+packer-plugin-libvirt
+.docs/*
+docs.zip

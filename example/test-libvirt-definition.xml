@@ -1,0 +1,63 @@
+<node>
+  <pool type="dir">
+    <name>base-images</name>
+    <uuid>802baea0-a438-4073-b354-a034ee6e6d9b</uuid>
+    <capacity unit="bytes">107374182400</capacity>
+    <allocation unit="bytes">0</allocation>
+    <available unit="bytes">107374182400</available>
+    <source>
+    </source>
+    <target>
+      <path>/base-images</path>
+    </target>
+    
+<volume>
+  <name>ubuntu-20.04-lts</name>
+  <source/>
+  <capacity unit="GiB">1</capacity>
+  <allocation unit="bytes">1</allocation>
+  <target>
+    <path>/base-images/ubuntu-20.04-lts</path>
+    <format type="qcow2"/>
+    <permissions>
+      <mode>0</mode>
+      <owner>0744</owner>
+      <group>0</group>
+      <label>virt_image_t</label>
+    </permissions>
+    <timestamps>
+      <atime>1341933637.273190990</atime>
+      <mtime>1341930622.047245868</mtime>
+      <ctime>1341930622.047245868</ctime>
+    </timestamps>
+  </target>
+</volume>
+  </pool>
+
+
+  <pool type="dir">
+    <name>default</name>
+    <uuid>699c2ad1-c809-415a-935a-fedc9a783fd1</uuid>
+    <capacity unit="bytes">107374182400</capacity>
+    <allocation unit="bytes">0</allocation>
+    <available unit="bytes">107374182400</available>
+    <source>
+    </source>
+    <target>
+      <path>/var/lib/libvirt/images</path>
+    </target>
+  </pool>
+
+  <network>
+    <name>default</name>
+    <uuid>dd8fe884-6c02-601e-7551-cca97df1c5df</uuid>
+    <forward mode="nat"/>
+    <bridge name="virbr0" stp="on" delay="0"/>
+    <ip address="192.168.122.1" netmask="255.255.255.0">
+      <dhcp>
+        <range start="192.168.122.2" end="192.168.122.254"/>
+      </dhcp>
+    </ip>
+  </network>
+
+</node>

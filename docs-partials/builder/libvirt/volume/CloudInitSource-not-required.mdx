@@ -1,0 +1,17 @@
+<!-- Code generated from the comments of the CloudInitSource struct in builder/libvirt/volume/cloudinit.go; DO NOT EDIT MANUALLY -->
+
+- `meta_data` (\*string) - [optional] NoCloud instance metadata as string.
+  If not present, a default one will be generated with the instance-id set to the same value as the domain name
+  If you want to set network config, see the `network_config` attribute
+
+- `user_data` (\*string) - [optional] CloudInit user-data as string.
+  See [cloud-init documentation](https://cloudinit.readthedocs.io/en/latest/topics/format.html) for more
+
+- `network_config` (\*string) - [optional] Network configuration for cloud-init to be picked up.
+  User-data cannot change an instance’s network configuration.
+  In the absence of network configuration in any sources,
+  Cloud-init will write out a network configuration that will issue a DHCP request on a “first” network interface.
+  Read more about the possible format and features at
+  [cloud-init documentation](https://cloudinit.readthedocs.io/en/latest/topics/network-config.html).
+
+<!-- End of code generated from the comments of the CloudInitSource struct in builder/libvirt/volume/cloudinit.go; -->

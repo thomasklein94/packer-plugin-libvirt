@@ -1,0 +1,32 @@
+<!-- Code generated from the comments of the Config struct in builder/libvirt/config.go; DO NOT EDIT MANUALLY -->
+
+- `communicator` (communicator.Config) - Communicator configuration
+  See [Packer's documentation](https://www.packer.io/docs/communicators) for more.
+
+- `domain_name` (string) - The libvirt name of the domain (virtual machine) running your build
+  If not specified, a random name with the prefix `packer-` will be used
+
+- `memory` (int) - The amount of memory to use when building the VM
+  in megabytes. This defaults to 512 megabytes.
+
+- `vcpu` (int) - The number of cpus to use when building the VM.
+  The default is `1` CPU.
+
+- `network_interface` ([]network.NetworkInterface) - Network interface attachments. See [Network](#network) for more.
+
+- `communicator_interface` (string) - The alias of the network interface used for the SSH/WinRM connections
+  See [Communicators and network interfaces](#communicators-and-network-interfaces)
+
+- `volume` ([]volume.Volume) - See [Volumes](#volumes)
+
+- `artifact_volume_alias` (string) - The alias of the drive designated to be the artifact. To learn more,
+  see [Volumes](#volumes)
+
+- `graphics` ([]DomainGraphic) - See [Graphics and video, headless domains](#graphics-and-video-headless-domains).
+
+- `network_address_source` (string) - The alias of the network interface designated as the communicator interface.
+  Can be either `agent`, `lease` or `arp`. Default value is `agent`.
+  To learn more, see [Communicators and network interfaces](#communicators-and-network-interfaces)
+  in the builder documentation.
+
+<!-- End of code generated from the comments of the Config struct in builder/libvirt/config.go; -->

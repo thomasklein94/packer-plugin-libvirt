@@ -1,0 +1,36 @@
+build {
+  name = "cloudimage-example"
+
+  source "libvirt.builder" {
+    volume {
+      alias = "artifact"
+
+      pool = "base-images"
+      name = "ubuntu-22.04-lts"
+
+      source {
+        type   = "http"
+        url    = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
+        format = "qcow2" 
+      }
+
+      capacity = "1G"
+
+      bus        = "sata"
+      target_dev = "sda"
+    }
+
+    volume {
+      source {
+        type = "cloud-init"
+
+        network_config = local.network_config
+        user_data      = local.user_data
+      }
+      capacity = "1M"
+
+      bus        = "sata"
+      target_dev = "sdb"
+    }
+  }
+}

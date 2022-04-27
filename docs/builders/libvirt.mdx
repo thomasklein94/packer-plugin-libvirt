@@ -1,0 +1,263 @@
+---
+description: >
+  The Libvirt Builder is able to create Libvirt volumes on your libvirt hypervisor
+  by copying an image from a http source, by using already existing volumes as a backing store,
+  or creating an empty one and starting a libvirt domain with these volumes attached.
+page_title: Libvirt - Builders
+nav_title: Libvirt
+---
+
+# Libvirt
+
+Type: `libvirt`
+Artifact BuilderId: `thomasklein94.libvirt`
+
+The Libvirt Builder is able to create Libvirt volumes on your libvirt hypervisor
+by copying an image from a http source, by using already existing volumes as a backing store,
+or creating an empty one and starting a libvirt domain with these volumes attached.
+
+Libvirt builder also supports cloudinit images during build.
+
+Before looking at the configuration options and examples, you might also want to check out and
+familiarize yourself with [libvirt's domain specification](https://libvirt.org/formatdomain.html)
+and [libvirt's storage pool and volume concepts](https://libvirt.org/formatstorage.html).
+
+<!-- Builder Configuration Fields -->
+
+### Required
+
+@include 'builder/libvirt/Config-required.mdx'
+
+### Optional
+
+@include 'builder/libvirt/Config-not-required.mdx'
+
+### Aliases
+Libvirt offers a way to add one alias per device. Libvirt builder uses this to find out which volume should be the
+artifact in case there are multiple volume configurations present. Finding the communicator interface is similar in fashion.
+There are reasonable defaults built into the builder to ease onboarding but they will produce a warning and it's 
+recommended to use aliases.
+
+The identifier must consist only of the following characters: `[a-zA-Z0-9_-]`. Libvirt also requires the identifier 
+to start with `ua-`, but libvirt builder will take care of that for you and prepend every alias with `ua-` before 
+applying the domain definition to libvirt.
+
+### Volumes
+
+Libvirt uses volumes to attach as disks, to boot from and to persist data to. Libvirt Builder treats volumes as sources
+and possible artifacts. Arbitrary number of volumes can be attached to a builder domain with specifying a `volume { }` 
+block for each. The volume which will be the artifact of the build has to be marked with `alias = "artifact"`.
+
+A volume defined with a source MUST NOT EXISTS BEFORE the build and WILL BE DESTROYED at the end of the build.
+The only exception is when the volume marked as an artifact in which case a successful build prevents libvirt builder from 
+deleting the volume.
+
+If a volume does not have a source defined, the volume must exists before the build, and will not be destroyed at the 
+end of the build.
+
+@include 'builder/libvirt/volume/Volume-not-required.mdx'
+
+#### Backing-store volume source
+Backing-store source instructs libvirt to use an already presented volume as a base for this volume.
+
+@include 'builder/libvirt/volume/BackingStoreVolumeSource-not-required.mdx'
+
+Example
+
+```hcl
+volume {
+  target_dev = "sda"
+  bus        = "sata"
+
+  pool = "default"
+  name = "custom-image"
+
+  source {
+    type = "backing-store"
+
+    pool   = "base-images"
+    volume = "ubuntu-22.04-lts"
+  }
+  capacity = "20G"
+}
+```
+
+#### Cloud-init volume source
+Linux domains running in a libvirt environment can be set up with the 
+[NoCloud cloud-init datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html).
+This means a small ISO image with the label `CIDATA` will be assembled at the machine running packer and will be uploaded to the volume.
+To assemble an ISO image, one of the following commands must be installed at the machine running packer and must be available 
+in the `PATH`: `xorriso`, `mkisofs`, `hdiutil` or `oscdimg`.
+
+For cloud-init backed sources, the size and capacity attributes can be omitted for the volume.
+
+@include 'builder/libvirt/volume/CloudInitSource-not-required.mdx'
+
+Example:
+
+```hcl
+volume {
+  target_dev = "sdb"
+  bus        = "sata"
+  source {
+    type = "cloud-init"
+
+    meta_data = jsonencode({
+      "instance-id" = "i-abcdefghijklm"
+      "hostname"    = "my-packer-builder"
+    })
+
+    user_data =  format("#cloud-config\n%s", jsonencode({
+      packages = [
+            "qemu-guest-agent",
+        ]
+        runcmd = [
+            ["systemctl", "enable", "--now", "qemu-guest-agent"],
+        ]
+        ssh_authorized_keys = [
+            data.sshkey.install.public_key,
+        ]
+    }))
+
+    network_config = jsonencode({
+      version = 2
+        ethernets = {
+            eth = {
+                match = {
+                    name = "en*"
+                }
+                dhcp4 = true
+            }
+        }
+    })
+  }
+}
+```
+
+#### HTTP volume source
+Libvirt builder can download and restream a volume from a web source to the libvirt host.
+** Important: ** The file will be downloaded from the machine running packer and without caching, it will be directly
+restreamed to libvirt as a volume. For moving large files, make sure you have the necessary download and upload 
+bandwidth.
+
+@include 'builder/libvirt/volume/HttpVolumeSource-not-required.mdx'
+
+Example:
+
+```hcl
+volume {
+  alias = "artifact"
+
+  pool = "base-images"
+  name = "ubuntu-22.04-lts"
+
+  source {
+    type   = "http"
+    url    = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
+    format = "qcow2" 
+  }
+
+  capacity = "1G"
+
+  bus        = "sata"
+  target_dev = "sda"
+}
+
+```
+
+### Network
+Network interfaces can be attached to a builder domain by adding a `network_interface { }` block for each.
+Currently only `managed` and `bridge` networks are supported.
+
+@include 'builder/libvirt/network/NetworkInterface-required.mdx'
+@include 'builder/libvirt/network/NetworkInterface-not-required.mdx'
+
+#### Communicators and network interfaces
+If an SSH or WinRM address is specified in the communicator block, packer will use that address to communicate with the
+builder domain.
+
+If no SSH or WinRM address is specified, the libvirt builder tries to find an address for initiating communications.
+If only one network interface is specified for a builder domain, and there is no `communicator_interface` specified for
+the domain, then that interface will be used as the interface for communication.
+
+If more than one network interface is specified, the communicator interface must be tagged by setting the same alias as 
+specified with the `communicator_interface` domain attribute (which is "communicator" by default.)
+
+The `network_address_source` domain attribute controls how the address discovery will take place. There are three 
+possible way to discover a domain's virtual address:
+- `agent`: this is the most reliable method for getting an address for the domain, but it requires `qemu-guest-agent`
+           running in the domain. This is the default method for domains.
+- `lease`: if for some reason, the guest agent can not be started, but the communicator interface is connected to
+           one of libvirt's managed networks, you can use `lease` to see what DHCP lease was offered for the interface.
+- `arp`: this method relies on the libvirt host ARP table to find an IP address associated with the MAC address given to
+         the domain.
+
+Examples
+
+For connecting to a managed network
+```hcl
+network_interface {
+  type    = "managed"
+  network = "my-managed-network"
+}
+```
+
+For connecting to a bridge
+```hcl
+network_interface {
+  type   = "bridge"
+  bridge = "br0"
+}
+```
+
+### Graphics and video, headless domains
+Libvirt builder creates a headless domain by default with no video card or monitor attached to it. Most linux distributions
+and cloud images are fine with this setup, but you might need to add a video card and a graphical interface to your machine.
+
+You can add one (or more) graphic device to your machine by using the `graphics { }` block.
+If at least one graphic device is added to the builder configuration, a video device with the model `virtio` will
+automatically be added to the domain.
+Currently, there is no option to specify or customize just a video device for a domain.
+
+@include 'builder/libvirt/DomainGraphic-required.mdx'
+@include 'builder/libvirt/SdlDomainGraphic-not-required.mdx'
+@include 'builder/libvirt/VNCDomainGraphic-not-required.mdx'
+
+### Debugging a build
+By default, Libvirt builder assigns two serial console to the domain with the aliases `serial-console` and `virtual-console`.
+You can use your virtual manager to connect to one of these consoles for debug.
+
+If you don't have access to a virtual machine manager, if specifying the `-debug` flag and `PACKER_LOG=1` environment
+variable to packer simultaneously while setting the `PACKER_LIBVIRT_STREAM_CONSOLE` to one of the console aliases, 
+the builder will connect to that console and logs any message the domain sends to that console.
+In no way, shape or form should this be used in any production or serious setup!
+
+### A simple builder definition example
+
+
+```hcl
+source "libvirt" "example" {
+  libvirt_uri = "qemu:///system"
+  network_interface {
+      type  = "managed"
+      alias = "communicator"
+  }
+
+  volume {
+    alias = "artifact"
+    source {
+        type   = "backing-store"
+        pool   = "base-images"
+        volume = "ubuntu-22.04-base"
+    }
+
+    capacity   = "10G"
+    target_dev = "sda"
+    bus        = "sata"
+  }
+}
+
+build {
+  sources = ["source.libvirt.example"]
+}
+```

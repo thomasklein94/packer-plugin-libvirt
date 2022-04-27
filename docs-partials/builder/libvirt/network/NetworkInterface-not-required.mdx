@@ -1,0 +1,13 @@
+<!-- Code generated from the comments of the NetworkInterface struct in builder/libvirt/network/network.go; DO NOT EDIT MANUALLY -->
+
+- `mac` (string) - [optional] If needed, a MAC address can be specified for the network interface.
+  If not specified, Libvirt will generate and assign a random MAC address
+
+- `alias` (string) - [optional] To help users identifying devices they care about, every device can have an alias which must be unique within the domain.
+  Additionally, the identifier must consist only of the following characters: `[a-zA-Z0-9_-]`.
+
+- `model` (string) - [optional] Defines how the interface should be modeled for the domain.
+  Typical values for QEMU and KVM include: `ne2k_isa` `i82551` `i82557b` `i82559er` `ne2k_pci` `pcnet` `rtl8139` `e1000` `virtio`.
+  If nothing is specified, `virtio` will be used as a default.
+
+<!-- End of code generated from the comments of the NetworkInterface struct in builder/libvirt/network/network.go; -->
