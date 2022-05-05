@@ -52,7 +52,7 @@ func (uri *LibvirtUri) GetExtra(p LibvirtUriExtraParam) (string, bool) {
 }
 
 func (uri *LibvirtUri) Unmarshal(s string) error {
-	uri_regex := `^(?P<Driver>[a-z]+)(\+(?P<Transport>[a-z]+))?://(((?P<Username>[a-z]+)@)?(?P<Hostname>[-_.a-z0-9]+)(:(?P<Port>[0-9]+)?)?)?/(?P<Path>[-_.a-z0-9]+)?(\?(?P<extra>.*))?$`
+	uri_regex := `^(?P<Driver>[a-z]+)(\+(?P<Transport>[a-z]+))?://(((?P<Username>[a-z]+)@)?(?P<Hostname>[-_.a-z0-9]+)(:(?P<Port>[0-9]+)?)?)?(?P<Path>/[-_.a-z0-9]+)?(\?(?P<extra>.*))?$`
 	re := regexp.MustCompile(uri_regex)
 
 	matches := allMatchedRegexpGroups(re, s)
@@ -88,7 +88,7 @@ func (uri *LibvirtUri) Unmarshal(s string) error {
 	}
 
 	if uri.Driver == "test" {
-		if ! filepath.IsAbs(uri.Path) && uri.Path != "/default" {
+		if !filepath.IsAbs(uri.Path) && uri.Path != "/default" {
 			abs, err := filepath.Abs(uri.Path)
 
 			if err != nil {
