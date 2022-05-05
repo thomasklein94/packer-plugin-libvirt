@@ -20,7 +20,7 @@ packer {
   required_plugins {
     libvirt = {
       version = ">= 0.1.0"
-      source  = "github.com/thomaskein94/packer-plugin-libvirt"
+      source  = "github.com/thomasklein94/libvirt"
     }
   }
 }
