@@ -142,7 +142,13 @@ func sshDialerSetVerification(uri LibvirtUri, dialer *SshDialer) error {
 		return fmt.Errorf("either %s=1 must be specified, or %s must be a path", LibvirtUriParam_NoVerify, LibvirtUriParam_KnownHost)
 	}
 
-	host_key_callback, err := knownhosts.New(known_host_path)
+	expanded_known_host_path, err := pathing.ExpandUser(known_host_path)
+
+	if err != nil {
+		return err
+	}
+
+	host_key_callback, err := knownhosts.New(expanded_known_host_path)
 	if err != nil {
 		return err
 	}
