@@ -4,6 +4,7 @@ package volume
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
@@ -83,6 +84,21 @@ func (vs *BackingStoreVolumeSource) PrepareVolume(pctx *PreparationContext) mult
 		Path:        backing_vol_def.Target.Path,
 		Format:      backing_vol_def.Target.Format,
 		Permissions: backing_vol_def.Target.Permissions,
+	}
+
+	if pctx.VolumeConfig.Capacity == "" {
+		volumeDef.Capacity = backing_vol_def.Capacity
+	}
+
+	err = pctx.CreateVolume()
+	if err != nil {
+		return pctx.HaltOnError(err, "%s", err)
+	}
+
+	err = pctx.RefreshVolumeDefinition()
+
+	if err != nil {
+		log.Printf("Error while refreshing volume definition: %s\n", err)
 	}
 
 	return multistep.ActionContinue
