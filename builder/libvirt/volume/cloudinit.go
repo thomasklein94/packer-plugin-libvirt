@@ -44,7 +44,12 @@ func (vs *CloudInitSource) UpdateDomainDiskXml(domainDisk *libvirtxml.DomainDisk
 	if domainDisk.Driver == nil {
 		domainDisk.Driver = &libvirtxml.DomainDiskDriver{}
 	}
+	if domainDisk.ReadOnly == nil {
+		domainDisk.ReadOnly = &libvirtxml.DomainDiskReadOnly{}
+	}
+
 	domainDisk.Driver.Type = "raw"
+	domainDisk.Device = "cdrom"
 }
 
 func (vs *CloudInitSource) UpdateStorageDefinitionXml(storageDef *libvirtxml.StorageVolume) {
