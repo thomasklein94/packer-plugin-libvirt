@@ -36,6 +36,8 @@ func (vs *BackingStoreVolumeSource) PrepareConfig(ctx *interpolate.Context, vol 
 		}
 	}
 
+	vol.allow_unspecified_size = true
+
 	return
 }
 

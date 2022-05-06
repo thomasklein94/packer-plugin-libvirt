@@ -114,28 +114,33 @@ func (v *Volume) PrepareConfig(ctx *interpolate.Context, domain_name string) (wa
 }
 
 func (v *Volume) StorageDefinitionXml() (*libvirtxml.StorageVolume, error) {
-	cap_val, cap_unit, err := fmtReadPostfixedValue(v.Capacity)
-
-	if err != nil {
-		return nil, fmt.Errorf("couldn't understand volume capacity '%s' : %s", v.Capacity, err)
-	}
-
-	alloc_val, alloc_unit, err := fmtReadPostfixedValue(v.Size)
-
-	if err != nil {
-		return nil, fmt.Errorf("couldn't understand volume size '%s' : %s", v.Size, err)
-	}
-
 	storageDef := &libvirtxml.StorageVolume{
 		Name: v.Name,
-		Allocation: &libvirtxml.StorageVolumeSize{
+	}
+
+	if v.Capacity != "" {
+		cap_val, cap_unit, err := fmtReadPostfixedValue(v.Capacity)
+
+		if err != nil {
+			return nil, fmt.Errorf("couldn't understand volume capacity '%s' : %s", v.Capacity, err)
+		}
+		storageDef.Capacity = &libvirtxml.StorageVolumeSize{
 			Value: cap_val,
 			Unit:  cap_unit,
-		},
-		Capacity: &libvirtxml.StorageVolumeSize{
+		}
+	}
+
+	if v.Size != "" {
+		alloc_val, alloc_unit, err := fmtReadPostfixedValue(v.Size)
+
+		if err != nil {
+			return nil, fmt.Errorf("couldn't understand volume size '%s' : %s", v.Size, err)
+		}
+
+		storageDef.Allocation = &libvirtxml.StorageVolumeSize{
 			Value: alloc_val,
 			Unit:  alloc_unit,
-		},
+		}
 	}
 
 	if v.Source != nil {
