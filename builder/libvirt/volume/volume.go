@@ -210,11 +210,13 @@ func (v *Volume) PrepareVolume(pctx *PreparationContext) multistep.StepAction {
 
 	if pctx.VolumeConfig.Source == nil {
 		vol, err := pctx.Driver.StorageVolLookupByName(*pctx.PoolRef, pctx.VolumeConfig.Name)
-		if err != nil {
+
+		if err == nil {
+			pctx.VolumeRef = &vol
+			pctx.VolumeIsCreated = false
+		} else if !pctx.VolumeIsArtifact {
 			return pctx.HaltOnError(err, "Error while looking up volume %s/%s: %s", v.Pool, v.Name, err)
 		}
-		pctx.VolumeRef = &vol
-		pctx.VolumeIsCreated = false
 	} else {
 		action := pctx.VolumeConfig.Source.PrepareVolume(pctx)
 		if action != multistep.ActionContinue {
