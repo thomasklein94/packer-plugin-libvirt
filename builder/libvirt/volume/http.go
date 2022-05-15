@@ -15,36 +15,23 @@ import (
 )
 
 type HttpVolumeSource struct {
-	// [required] An URL for installation image
+	// [required] An URL for installation image. Currently only http and https sources are supported.
+	// The URL must be reachable by the machine running packer
 	Url string `mapstructure:"url" required:"false"`
-	// [required] The storage format type, eg `cow`, `qcow`, `qcow2`, `vmdk`, `raw`.
-	Format string `mapstructure:"format" required:"false"`
 }
 
 func (vs *HttpVolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Volume) (warnings []string, errs []error) {
-	if vs.Format == "" {
-		vs.Format = "qcow2"
-		warnings = append(warnings, fmt.Sprintf("Http source format didn't set, using %s", vs.Format))
+	errs = []error{}
+	if vs.Url == "" {
+		errs = append(errs, fmt.Errorf("URL must be specified for volume source with type http"))
 	}
+
 	return
 }
 
-func (vs *HttpVolumeSource) UpdateDomainDiskXml(domainDisk *libvirtxml.DomainDisk) {
-	if domainDisk.Driver == nil {
-		domainDisk.Driver = &libvirtxml.DomainDiskDriver{}
-	}
-	domainDisk.Driver.Type = vs.Format
-}
+func (vs *HttpVolumeSource) UpdateDomainDiskXml(domainDisk *libvirtxml.DomainDisk) {}
 
-func (vs *HttpVolumeSource) UpdateStorageDefinitionXml(storageDef *libvirtxml.StorageVolume) {
-	if storageDef.Target == nil {
-		storageDef.Target = &libvirtxml.StorageVolumeTarget{}
-	}
-	if storageDef.Target.Format == nil {
-		storageDef.Target.Format = &libvirtxml.StorageVolumeTargetFormat{}
-	}
-	storageDef.Target.Format.Type = vs.Format
-}
+func (vs *HttpVolumeSource) UpdateStorageDefinitionXml(storageDef *libvirtxml.StorageVolume) {}
 
 func (vs *HttpVolumeSource) PrepareVolume(pctx *PreparationContext) multistep.StepAction {
 	pctx.Ui.Message(fmt.Sprintf("Using volume source from URL: '%s'", vs.Url))

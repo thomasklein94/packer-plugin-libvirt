@@ -4,6 +4,7 @@ build {
   source "libvirt.builder" {
     volume {
       alias = "artifact"
+      format = "qcow2"
 
       pool = "base-images"
       name = "ubuntu-22.04-lts"
@@ -11,7 +12,6 @@ build {
       source {
         type   = "http"
         url    = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
-        format = "qcow2" 
       }
 
       capacity = "1G"

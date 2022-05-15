@@ -58,6 +58,9 @@ type Volume struct {
 	// To help users identifying devices they care about, every device can have an alias which must be unique within the domain.
 	// Additionally, the identifier must consist only of the following characters: `[a-zA-Z0-9_-]`.
 	Alias string `mapstructure:"alias" required:"false"`
+	// Specifies the volume format type, like `qcow`, `qcow2`, `vmdk`, `raw`. If omitted, the storage pool's default format
+	// will be used.
+	Format string `mapstructure:"format" required:"false"`
 
 	allow_unspecified_size bool `undocumented:"true"`
 }
@@ -143,6 +146,12 @@ func (v *Volume) StorageDefinitionXml() (*libvirtxml.StorageVolume, error) {
 		}
 	}
 
+	if v.Format != "" {
+		storageDef.Target = &libvirtxml.StorageVolumeTarget{
+			Format: &libvirtxml.StorageVolumeTargetFormat{Type: v.Format},
+		}
+	}
+
 	if v.Source != nil {
 		v.Source.UpdateStorageDefinitionXml(storageDef)
 	}
@@ -178,6 +187,11 @@ func (v *Volume) DomainDiskXml() *libvirtxml.DomainDisk {
 			domainDisk.Target = &libvirtxml.DomainDiskTarget{}
 		}
 		domainDisk.Target.Dev = v.TargetDev
+	}
+
+	if v.Format != "" {
+		domainDisk.Driver = &libvirtxml.DomainDiskDriver{}
+		domainDisk.Driver.Type = v.Format
 	}
 
 	if v.ReadOnly {

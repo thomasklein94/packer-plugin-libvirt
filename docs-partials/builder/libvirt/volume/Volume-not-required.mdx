@@ -45,4 +45,7 @@
 - `alias` (string) - To help users identifying devices they care about, every device can have an alias which must be unique within the domain.
   Additionally, the identifier must consist only of the following characters: `[a-zA-Z0-9_-]`.
 
+- `format` (string) - Specifies the volume format type, like `qcow`, `qcow2`, `vmdk`, `raw`. If omitted, the storage pool's default format
+  will be used.
+
 <!-- End of code generated from the comments of the Volume struct in builder/libvirt/volume/volume.go; -->

@@ -64,8 +64,7 @@ func (*FlatCloudInitSource) HCL2Spec() map[string]hcldec.Spec {
 // FlatHttpVolumeSource is an auto-generated flat version of HttpVolumeSource.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatHttpVolumeSource struct {
-	Url    *string `mapstructure:"url" required:"false" cty:"url" hcl:"url"`
-	Format *string `mapstructure:"format" required:"false" cty:"format" hcl:"format"`
+	Url *string `mapstructure:"url" required:"false" cty:"url" hcl:"url"`
 }
 
 // FlatMapstructure returns a new FlatHttpVolumeSource.
@@ -80,8 +79,7 @@ func (*HttpVolumeSource) FlatMapstructure() interface{ HCL2Spec() map[string]hcl
 // The decoded values from this spec will then be applied to a FlatHttpVolumeSource.
 func (*FlatHttpVolumeSource) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
-		"url":    &hcldec.AttrSpec{Name: "url", Type: cty.String, Required: false},
-		"format": &hcldec.AttrSpec{Name: "format", Type: cty.String, Required: false},
+		"url": &hcldec.AttrSpec{Name: "url", Type: cty.String, Required: false},
 	}
 	return s
 }
@@ -98,6 +96,7 @@ type FlatVolume struct {
 	TargetDev *string           `mapstructure:"target_dev" required:"false" cty:"target_dev" hcl:"target_dev"`
 	Bus       *string           `mapstructure:"bus" required:"false" cty:"bus" hcl:"bus"`
 	Alias     *string           `mapstructure:"alias" required:"false" cty:"alias" hcl:"alias"`
+	Format    *string           `mapstructure:"format" required:"false" cty:"format" hcl:"format"`
 }
 
 // FlatMapstructure returns a new FlatVolume.
@@ -121,6 +120,7 @@ func (*FlatVolume) HCL2Spec() map[string]hcldec.Spec {
 		"target_dev": &hcldec.AttrSpec{Name: "target_dev", Type: cty.String, Required: false},
 		"bus":        &hcldec.AttrSpec{Name: "bus", Type: cty.String, Required: false},
 		"alias":      &hcldec.AttrSpec{Name: "alias", Type: cty.String, Required: false},
+		"format":     &hcldec.AttrSpec{Name: "format", Type: cty.String, Required: false},
 	}
 	return s
 }
@@ -130,7 +130,6 @@ func (*FlatVolume) HCL2Spec() map[string]hcldec.Spec {
 type FlatVolumeSource struct {
 	Type          *string `mapstructure:"type" required:"true" cty:"type" hcl:"type"`
 	Url           *string `mapstructure:"url" required:"false" cty:"url" hcl:"url"`
-	Format        *string `mapstructure:"format" required:"false" cty:"format" hcl:"format"`
 	MetaData      *string `mapstructure:"meta_data" cty:"meta_data" hcl:"meta_data"`
 	UserData      *string `mapstructure:"user_data" cty:"user_data" hcl:"user_data"`
 	NetworkConfig *string `mapstructure:"network_config" cty:"network_config" hcl:"network_config"`
@@ -153,7 +152,6 @@ func (*FlatVolumeSource) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
 		"type":           &hcldec.AttrSpec{Name: "type", Type: cty.String, Required: false},
 		"url":            &hcldec.AttrSpec{Name: "url", Type: cty.String, Required: false},
-		"format":         &hcldec.AttrSpec{Name: "format", Type: cty.String, Required: false},
 		"meta_data":      &hcldec.AttrSpec{Name: "meta_data", Type: cty.String, Required: false},
 		"user_data":      &hcldec.AttrSpec{Name: "user_data", Type: cty.String, Required: false},
 		"network_config": &hcldec.AttrSpec{Name: "network_config", Type: cty.String, Required: false},
