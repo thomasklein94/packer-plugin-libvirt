@@ -4,6 +4,7 @@ package libvirt
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/digitalocean/go-libvirt"
 	"github.com/hashicorp/packer-plugin-sdk/common"
@@ -55,8 +56,29 @@ type Config struct {
 	NetworkAddressSource string `mapstructure:"network_address_source" required:"false"`
 
 	LibvirtURI string `mapstructure:"libvirt_uri" required:"true"`
+	// Packer will instruct libvirt to use this mode to properly shut down the virtual machine
+	// before it attempts to destroy it. Available modes are: `acpi`, `guest`, `initctl`, `signal` and `paravirt`.
+	// If not set, libvirt will choose the method of shutdown it considers the best.
+	ShutdownMode string `mapstructure:"shutdown_mode" required:"false"`
+	// After succesfull provisioning, Packer will wait this long for the virtual machine to gracefully
+	// stop before it destroys it. If not specified, Packer will wait for 5 minutes.
+	ShutdownTimeout time.Duration `mapstructure:"shutdown_timeout" required:"false"`
 
 	ctx interpolate.Context
+}
+
+func mapDomainShutdown(str string) (result libvirt.DomainShutdownFlagValues, ok bool) {
+	var domainShutdownFlagMaps = map[string]libvirt.DomainShutdownFlagValues{
+		"auto":     libvirt.DomainShutdownDefault,
+		"acpi":     libvirt.DomainShutdownAcpiPowerBtn,
+		"guest":    libvirt.DomainShutdownGuestAgent,
+		"initctl":  libvirt.DomainShutdownInitctl,
+		"signal":   libvirt.DomainShutdownSignal,
+		"paravirt": libvirt.DomainShutdownParavirt,
+	}
+
+	result, ok = domainShutdownFlagMaps[str]
+	return
 }
 
 func mapNetworkAddressSources(s string) (sf uint32, err error) {
@@ -177,6 +199,19 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 
 	if _, err := mapNetworkAddressSources(c.NetworkAddressSource); err != nil {
 		errs = packersdk.MultiErrorAppend(errs, err)
+	}
+
+	if c.ShutdownMode == "" {
+		c.ShutdownMode = "auto"
+	}
+
+	if _, ok := mapDomainShutdown(c.ShutdownMode); !ok {
+		err := fmt.Errorf("unrecognized shutdown mode '%s'", c.ShutdownMode)
+		errs = packersdk.MultiErrorAppend(errs, err)
+	}
+
+	if c.ShutdownTimeout <= 0 {
+		c.ShutdownTimeout = 5 * time.Minute
 	}
 
 	if len(errs.Errors) > 0 {

@@ -32,6 +32,8 @@ type FlatConfig struct {
 	DomainGraphics        []FlatDomainGraphic            `mapstructure:"graphics" required:"false" cty:"graphics" hcl:"graphics"`
 	NetworkAddressSource  *string                        `mapstructure:"network_address_source" required:"false" cty:"network_address_source" hcl:"network_address_source"`
 	LibvirtURI            *string                        `mapstructure:"libvirt_uri" required:"true" cty:"libvirt_uri" hcl:"libvirt_uri"`
+	ShutdownMode          *string                        `mapstructure:"shutdown_mode" required:"false" cty:"shutdown_mode" hcl:"shutdown_mode"`
+	ShutdownTimeout       *string                        `mapstructure:"shutdown_timeout" required:"false" cty:"shutdown_timeout" hcl:"shutdown_timeout"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -65,6 +67,8 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"graphics":                   &hcldec.BlockListSpec{TypeName: "graphics", Nested: hcldec.ObjectSpec((*FlatDomainGraphic)(nil).HCL2Spec())},
 		"network_address_source":     &hcldec.AttrSpec{Name: "network_address_source", Type: cty.String, Required: false},
 		"libvirt_uri":                &hcldec.AttrSpec{Name: "libvirt_uri", Type: cty.String, Required: false},
+		"shutdown_mode":              &hcldec.AttrSpec{Name: "shutdown_mode", Type: cty.String, Required: false},
+		"shutdown_timeout":           &hcldec.AttrSpec{Name: "shutdown_timeout", Type: cty.String, Required: false},
 	}
 	return s
 }

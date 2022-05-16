@@ -42,6 +42,12 @@ The identifier must consist only of the following characters: `[a-zA-Z0-9_-]`. L
 to start with `ua-`, but libvirt builder will take care of that for you and prepend every alias with `ua-` before 
 applying the domain definition to libvirt.
 
+### Graceful shutdown
+To ensure all changes were synced to the artifact volume,
+after a **successful provisioning**, the Libvirt plugin will try to gracefully terminate the builder instance
+by sending a shutdown command to libvirt and wait up to `shutdown_timeout` before forcefully destroys the domain.
+Libvirt supports multiple way to shut down a domain, which can be controlled by the `shutdown_mode` attribute.
+
 ### Volumes
 
 Libvirt uses volumes to attach as disks, to boot from and to persist data to. Libvirt Builder treats volumes as sources

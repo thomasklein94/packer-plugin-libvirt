@@ -50,7 +50,8 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	steps := []multistep.Step{}
 	steps = append(steps,
 		&stepPrepareVolumes{},
-		&stepCreateDomain{},
+		&stepDefineDomain{},
+		&stepStartDomain{},
 	)
 
 	switch b.config.Communicator.Type {
@@ -69,7 +70,10 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		ui.Error(fmt.Sprintf("Unsupported communicator type '%s', no communication will be established to domain", b.config.Communicator.Type))
 	}
 
-	steps = append(steps, &commonsteps.StepProvision{})
+	steps = append(steps,
+		&commonsteps.StepProvision{},
+		&stepShutdownDomain{},
+	)
 
 	// Run
 	b.runner = commonsteps.NewRunnerWithPauseFn(steps, b.config.PackerConfig, ui, state)

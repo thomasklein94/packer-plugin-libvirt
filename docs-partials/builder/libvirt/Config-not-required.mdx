@@ -29,4 +29,11 @@
   To learn more, see [Communicators and network interfaces](#communicators-and-network-interfaces)
   in the builder documentation.
 
+- `shutdown_mode` (string) - Packer will instruct libvirt to use this mode to properly shut down the virtual machine
+  before it attempts to destroy it. Available modes are: `acpi`, `guest`, `initctl`, `signal` and `paravirt`.
+  If not set, libvirt will choose the method of shutdown it considers the best.
+
+- `shutdown_timeout` (duration string | ex: "1h5m2s") - After succesfull provisioning, Packer will wait this long for the virtual machine to gracefully
+  stop before it destroys it. If not specified, Packer will wait for 5 minutes.
+
 <!-- End of code generated from the comments of the Config struct in builder/libvirt/config.go; -->
