@@ -52,8 +52,8 @@ A volume defined with a source MUST NOT EXISTS BEFORE the build and WILL BE DEST
 The only exception is when the volume marked as an artifact in which case a successful build prevents libvirt builder from 
 deleting the volume.
 
-If a volume does not have a source defined, the volume must exists before the build, and will not be destroyed at the 
-end of the build.
+If a volume does not have a source defined and does not marked as an artifact,
+the volume must exists before the build, and will not be destroyed at the end of the build.
 
 @include 'builder/libvirt/volume/Volume-not-required.mdx'
 
@@ -154,8 +154,9 @@ volume {
   source {
     type   = "http"
     url    = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
-    format = "qcow2" 
   }
+
+  format = "qcow2"
 
   capacity = "1G"
 
