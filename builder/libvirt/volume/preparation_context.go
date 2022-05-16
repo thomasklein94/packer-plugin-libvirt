@@ -49,6 +49,31 @@ func (pctx *PreparationContext) CreateVolume() error {
 	return nil
 }
 
+func (pctx *PreparationContext) CloneVolumeFrom(source_pool libvirt.StoragePool, source_vol libvirt.StorageVol) error {
+	if pctx.VolumeRef != nil {
+		return fmt.Errorf("CreateVolumeFrom: Volume already exists")
+	}
+
+	if pctx.VolumeDefinition.BackingStore != nil {
+		return fmt.Errorf("can't simultaneously clone a volume and use a backing store")
+	}
+
+	volume_xml, err := pctx.VolumeDefinition.Marshal()
+	if err != nil {
+		return fmt.Errorf("CreateVolumeFrom.Marshal: %s", err)
+	}
+
+	ref, err := pctx.Driver.StorageVolCreateXMLFrom(source_pool, volume_xml, source_vol, 0)
+	if err != nil {
+		return fmt.Errorf("CreateVolumeFrom.RPC: %s", err)
+	}
+
+	pctx.VolumeRef = &ref
+	pctx.VolumeIsCreated = true
+
+	return nil
+}
+
 func (pctx *PreparationContext) RefreshVolumeDefinition() error {
 	rawVolumeDef, err := pctx.Driver.StorageVolGetXMLDesc(*pctx.VolumeRef, 0)
 	if err != nil {

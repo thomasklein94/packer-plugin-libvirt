@@ -13,9 +13,10 @@ import (
 type VolumeSource struct {
 	Type string `mapstructure:"type" required:"true"`
 	// BackingStore BackingStoreVolumeSource `mapstructure:",squash"`
-	Http         HttpVolumeSource         `mapstructure:",squash"`
-	CloudInit    CloudInitSource          `mapstructure:",squash"`
-	BackingStore BackingStoreVolumeSource `mapstructure:",squash"`
+	Http          HttpVolumeSource         `mapstructure:",squash"`
+	CloudInit     CloudInitSource          `mapstructure:",squash"`
+	BackingStore  BackingStoreVolumeSource `mapstructure:",squash"`
+	CloningVolume CloningVolumeSource      `mapstructure:",squash"`
 }
 
 func (vs *VolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Volume, domain_name string) (warnings []string, errs []error) {
@@ -26,6 +27,8 @@ func (vs *VolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Volume, dom
 		return vs.CloudInit.PrepareConfig(ctx, vol, domain_name)
 	case "backing-store", "backingstore":
 		return vs.BackingStore.PrepareConfig(ctx, vol)
+	case "cloning", "clone":
+		vs.CloningVolume.PrepareConfig(ctx, vol)
 	default:
 		errs = append(errs, fmt.Errorf("unsupported volume source type '%s'", vs.Type))
 	}
@@ -40,6 +43,8 @@ func (vs *VolumeSource) UpdateDomainDiskXml(domainDisk *libvirtxml.DomainDisk) {
 		vs.CloudInit.UpdateDomainDiskXml(domainDisk)
 	case "backing-store", "backingstore":
 		vs.BackingStore.UpdateDomainDiskXml(domainDisk)
+	case "cloning", "clone":
+		vs.CloningVolume.UpdateDomainDiskXml(domainDisk)
 	}
 }
 
@@ -51,6 +56,8 @@ func (vs *VolumeSource) UpdateStorageDefinitionXml(storageDef *libvirtxml.Storag
 		vs.CloudInit.UpdateStorageDefinitionXml(storageDef)
 	case "backing-store", "backingstore":
 		vs.BackingStore.UpdateStorageDefinitionXml(storageDef)
+	case "cloning", "clone":
+		vs.CloningVolume.UpdateStorageDefinitionXml(storageDef)
 	}
 }
 
@@ -62,6 +69,8 @@ func (vs *VolumeSource) PrepareVolume(pctx *PreparationContext) multistep.StepAc
 		return vs.CloudInit.PrepareVolume(pctx)
 	case "backing-store", "backingstore":
 		return vs.BackingStore.PrepareVolume(pctx)
+	case "cloning", "clone":
+		vs.CloningVolume.PrepareVolume(pctx)
 	}
 	return multistep.ActionContinue
 }

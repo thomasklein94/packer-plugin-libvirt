@@ -82,6 +82,31 @@ volume {
 }
 ```
 
+#### Cloning a volume
+If you wish to clone a volume instead of using a backing store overlay described above,
+You have the option to use the `cloning` source type.
+
+@include 'builder/libvirt/volume/CloningVolumeSource-not-required.mdx'
+
+Example
+
+```hcl
+volume {
+  target_dev = "sda"
+  bus        = "sata"
+
+  pool = "default"
+  name = "custom-image"
+
+  source {
+    type = "cloning"
+
+    pool   = "base-images"
+    volume = "ubuntu-22.04-lts"
+  }
+}
+```
+
 #### Cloud-init volume source
 Linux domains running in a libvirt environment can be set up with the 
 [NoCloud cloud-init datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html).

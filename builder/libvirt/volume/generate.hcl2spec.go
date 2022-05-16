@@ -34,6 +34,31 @@ func (*FlatBackingStoreVolumeSource) HCL2Spec() map[string]hcldec.Spec {
 	return s
 }
 
+// FlatCloningVolumeSource is an auto-generated flat version of CloningVolumeSource.
+// Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
+type FlatCloningVolumeSource struct {
+	Pool   *string `mapstucture:"pool" required:"false" cty:"pool" hcl:"pool"`
+	Volume *string `mapstructure:"volume" required:"false" cty:"volume" hcl:"volume"`
+}
+
+// FlatMapstructure returns a new FlatCloningVolumeSource.
+// FlatCloningVolumeSource is an auto-generated flat version of CloningVolumeSource.
+// Where the contents a fields with a `mapstructure:,squash` tag are bubbled up.
+func (*CloningVolumeSource) FlatMapstructure() interface{ HCL2Spec() map[string]hcldec.Spec } {
+	return new(FlatCloningVolumeSource)
+}
+
+// HCL2Spec returns the hcl spec of a CloningVolumeSource.
+// This spec is used by HCL to read the fields of CloningVolumeSource.
+// The decoded values from this spec will then be applied to a FlatCloningVolumeSource.
+func (*FlatCloningVolumeSource) HCL2Spec() map[string]hcldec.Spec {
+	s := map[string]hcldec.Spec{
+		"pool":   &hcldec.AttrSpec{Name: "pool", Type: cty.String, Required: false},
+		"volume": &hcldec.AttrSpec{Name: "volume", Type: cty.String, Required: false},
+	}
+	return s
+}
+
 // FlatCloudInitSource is an auto-generated flat version of CloudInitSource.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatCloudInitSource struct {
