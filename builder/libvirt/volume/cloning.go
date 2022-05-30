@@ -28,7 +28,7 @@ func (vs *CloningVolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Volu
 		errs = append(errs, fmt.Errorf("cloning store volume missing volume name"))
 	}
 
-	vol.allow_unspecified_size = true
+	vol.allowUnspecifiedSize = true
 
 	return
 }
@@ -51,29 +51,29 @@ func (vs *CloningVolumeSource) UpdateStorageDefinitionXml(storageDef *libvirtxml
 }
 
 func (vs *CloningVolumeSource) PrepareVolume(pctx *PreparationContext) multistep.StepAction {
-	backing_pool, err := pctx.Driver.StoragePoolLookupByName(vs.Pool)
+	backingPool, err := pctx.Driver.StoragePoolLookupByName(vs.Pool)
 	if err != nil {
 		return pctx.HaltOnError(err, "CloningVolumeSource.PoolLookup: %s", err)
 	}
 
-	backing_vol, err := pctx.Driver.StorageVolLookupByName(backing_pool, vs.Volume)
+	backingVol, err := pctx.Driver.StorageVolLookupByName(backingPool, vs.Volume)
 	if err != nil {
 		return pctx.HaltOnError(err, "CloningVolumeSource.VolumeLookup: %s", err)
 	}
 
-	raw_xml, err := pctx.Driver.StorageVolGetXMLDesc(backing_vol, 0)
+	rawXML, err := pctx.Driver.StorageVolGetXMLDesc(backingVol, 0)
 	if err != nil {
 		return pctx.HaltOnError(err, "CloningVolumeSource.GetXMLDescription: %s", err)
 	}
 
-	backing_vol_def := &libvirtxml.StorageVolume{}
-	err = backing_vol_def.Unmarshal(raw_xml)
+	backingVolDef := &libvirtxml.StorageVolume{}
+	err = backingVolDef.Unmarshal(rawXML)
 
 	if err != nil {
 		return pctx.HaltOnError(err, "CloningVolumeSource.Unmarshal: %s", err)
 	}
 
-	err = pctx.CloneVolumeFrom(backing_pool, backing_vol)
+	err = pctx.CloneVolumeFrom(backingPool, backingVol)
 
 	if err != nil {
 		return pctx.HaltOnError(err, "%s", err)

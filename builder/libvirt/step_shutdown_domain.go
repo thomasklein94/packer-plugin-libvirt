@@ -22,9 +22,9 @@ func (s *stepShutdownDomain) Run(ctx context.Context, state multistep.StateBag) 
 	domain := state.Get("domain").(*libvirt.Domain)
 
 	ui.Say("Shutting down libvirt domain...")
-	shutdown_mode, _ := mapDomainShutdown(config.ShutdownMode)
+	shutdownMode, _ := mapDomainShutdown(config.ShutdownMode)
 
-	err := driver.DomainShutdownFlags(*domain, shutdown_mode)
+	err := driver.DomainShutdownFlags(*domain, shutdownMode)
 	if err != nil {
 		fmterr := fmt.Errorf("couldn't shut down domain gracefully: %s", err)
 		ui.Error(fmterr.Error())
@@ -37,12 +37,12 @@ func (s *stepShutdownDomain) Run(ctx context.Context, state multistep.StateBag) 
 	subCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	poll_errs := make(chan error, 1)
-	poll_results := make(chan libvirt.DomainState)
+	pollErrs := make(chan error, 1)
+	pollResults := make(chan libvirt.DomainState)
 	timeout := time.After(config.ShutdownTimeout)
 	period := 5 * time.Second
 
-	go libvirtutils.PollDomainState(subCtx, period, *driver, *domain, poll_results, poll_errs)
+	go libvirtutils.PollDomainState(subCtx, period, *driver, *domain, pollResults, pollErrs)
 
 	for {
 		select {
@@ -51,7 +51,7 @@ func (s *stepShutdownDomain) Run(ctx context.Context, state multistep.StateBag) 
 			ui.Error("Domain did not stopped in time")
 			return multistep.ActionHalt
 
-		case res := <-poll_results:
+		case res := <-pollResults:
 			if libvirtutils.DomainStateMeansStopped(res) {
 				if res == libvirt.DomainCrashed {
 					ui.Error("Domain crashed while waiting for a graceful shutdown")
@@ -61,7 +61,7 @@ func (s *stepShutdownDomain) Run(ctx context.Context, state multistep.StateBag) 
 				return multistep.ActionContinue
 			}
 
-		case err := <-poll_errs:
+		case err := <-pollErrs:
 			cancel()
 			return haltOnError(ui, state, "error while waiting for a clean shutdown: %s", err)
 

@@ -73,7 +73,7 @@ func formatAddress(domAddr libvirt.DomainIPAddr) (string, error) {
 	// In some extreme setups it can happen that packer can only communicate on a link-local interface without DHCP.
 	// In those cases, using a link-local IPv6 address might be beneficial, hence this small "workaround".
 	// Currently, this is an undocumented feature and use it with extreme caution!
-	link_local_interface := os.Getenv("PACKER_LIBVIRT_COMMUNICATOR_LINK_LOCAL_INTERFACE")
+	linkLocalIf := os.Getenv("PACKER_LIBVIRT_COMMUNICATOR_LINK_LOCAL_INTERFACE")
 
 	switch libvirt.IPAddrType(domAddr.Type) {
 	case libvirt.IPAddrTypeIpv6:
@@ -83,12 +83,12 @@ func formatAddress(domAddr libvirt.DomainIPAddr) (string, error) {
 			return "", err
 		}
 		if addr.IsLinkLocalUnicast() {
-			if link_local_interface == "" {
-				return "", fmt.Errorf("unable to use ipv6 link local address '%s' due to PACKER_LIBVIRT_COMMUNICATOR_LINK_LOCAL_INTERFACE not being set", domAddr.Addr)
+			if linkLocalIf == "" {
+				return "", fmt.Errorf("unable to use ipv6 link local address '%s' for communication", domAddr.Addr)
 			}
 
 			// IPv6 link-local addresses must be formatted as [<address>%<interface>]
-			return fmt.Sprintf("[%s%%%s]", domAddr.Addr, link_local_interface), nil
+			return fmt.Sprintf("[%s%%%s]", domAddr.Addr, linkLocalIf), nil
 		}
 
 		return fmt.Sprintf("[%s]", domAddr.Addr), nil

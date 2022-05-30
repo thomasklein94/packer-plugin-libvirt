@@ -45,19 +45,19 @@ func (s *stepDefineDomain) Run(ctx context.Context, state multistep.StateBag) mu
 		log.Printf("couldn't refresh domain definition: %s\n", err)
 	}
 
-	var communicator_interface *libvirtxml.DomainInterface = nil
+	var commIface *libvirtxml.DomainInterface = nil
 
 	for _, ni := range domainDef.Devices.Interfaces {
 		if ni.Alias != nil && ni.Alias.Name == config.CommunicatorInterface {
-			communicator_interface = &ni
+			commIface = &ni
 		}
 	}
 
-	netaddr_source, _ := mapNetworkAddressSources(config.NetworkAddressSource)
+	netaddrSource, _ := mapNetworkAddressSources(config.NetworkAddressSource)
 
 	state.Put("communicator_address_helper", &communicatorAddressHelper{
-		InterfaceDef: communicator_interface,
-		Source:       netaddr_source,
+		InterfaceDef: commIface,
+		Source:       netaddrSource,
 	})
 
 	return multistep.ActionContinue
@@ -65,10 +65,10 @@ func (s *stepDefineDomain) Run(ctx context.Context, state multistep.StateBag) mu
 
 func (s *stepDefineDomain) Cleanup(state multistep.StateBag) {
 	ui := state.Get("ui").(packersdk.Ui)
-	domain, domain_ok := state.GetOk("domain")
+	domain, ok := state.GetOk("domain")
 	driver := state.Get("driver").(*libvirt.Libvirt)
 
-	if domain_ok && domain != nil {
+	if ok && domain != nil {
 		ui.Say("Undefining the domain...")
 		domain := domain.(*libvirt.Domain)
 		driver.DomainUndefineFlags(*domain, 0)

@@ -36,7 +36,7 @@ func (vs *BackingStoreVolumeSource) PrepareConfig(ctx *interpolate.Context, vol 
 		}
 	}
 
-	vol.allow_unspecified_size = true
+	vol.allowUnspecifiedSize = true
 
 	return
 }
@@ -59,23 +59,23 @@ func (vs *BackingStoreVolumeSource) UpdateStorageDefinitionXml(storageDef *libvi
 }
 
 func (vs *BackingStoreVolumeSource) PrepareVolume(pctx *PreparationContext) multistep.StepAction {
-	backing_pool, err := pctx.Driver.StoragePoolLookupByName(vs.Pool)
+	backingPool, err := pctx.Driver.StoragePoolLookupByName(vs.Pool)
 	if err != nil {
 		return pctx.HaltOnError(err, "BackingStoreSource.PoolLookup: %s", err)
 	}
 
-	backing_vol, err := pctx.Driver.StorageVolLookupByName(backing_pool, vs.Volume)
+	backingVol, err := pctx.Driver.StorageVolLookupByName(backingPool, vs.Volume)
 	if err != nil {
 		return pctx.HaltOnError(err, "BackingStoreSource.VolumeLookup: %s", err)
 	}
 
-	raw_xml, err := pctx.Driver.StorageVolGetXMLDesc(backing_vol, 0)
+	rawXML, err := pctx.Driver.StorageVolGetXMLDesc(backingVol, 0)
 	if err != nil {
 		return pctx.HaltOnError(err, "BackingStoreSource.GetXMLDescription: %s", err)
 	}
 
-	backing_vol_def := &libvirtxml.StorageVolume{}
-	err = backing_vol_def.Unmarshal(raw_xml)
+	backingVolDef := &libvirtxml.StorageVolume{}
+	err = backingVolDef.Unmarshal(rawXML)
 
 	if err != nil {
 		return pctx.HaltOnError(err, "BackingStoreSource.Unmarshal: %s", err)
@@ -83,13 +83,13 @@ func (vs *BackingStoreVolumeSource) PrepareVolume(pctx *PreparationContext) mult
 
 	volumeDef := pctx.VolumeDefinition
 	volumeDef.BackingStore = &libvirtxml.StorageVolumeBackingStore{
-		Path:        backing_vol_def.Target.Path,
-		Format:      backing_vol_def.Target.Format,
-		Permissions: backing_vol_def.Target.Permissions,
+		Path:        backingVolDef.Target.Path,
+		Format:      backingVolDef.Target.Format,
+		Permissions: backingVolDef.Target.Permissions,
 	}
 
 	if pctx.VolumeConfig.Capacity == "" {
-		volumeDef.Capacity = backing_vol_def.Capacity
+		volumeDef.Capacity = backingVolDef.Capacity
 	}
 
 	err = pctx.CreateVolume()

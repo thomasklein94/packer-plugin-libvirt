@@ -39,17 +39,19 @@ func (ni *NetworkInterface) PrepareConfig(ctx *interpolate.Context) (warnings []
 		ni.Alias = fmt.Sprintf("ua-%s", ni.Alias)
 	}
 
-	var imp_warnings []string
-	var imp_errs []error
+	var w []string
+	var e []error
 	switch ni.Type {
 	case "managed", "network":
-		imp_warnings, imp_errs = ni.Managed.PrepareConfig(ctx)
+		w, e = ni.Managed.PrepareConfig(ctx)
+	case "bridge":
+		w, e = ni.Bridge.PrepareConfig(ctx)
 	default:
 		errs = append(errs, fmt.Errorf("unsupported network interface type '%s'", ni.Type))
 		return
 	}
-	warnings = append(warnings, imp_warnings...)
-	errs = append(errs, imp_errs...)
+	warnings = append(warnings, w...)
+	errs = append(errs, e...)
 
 	return
 }

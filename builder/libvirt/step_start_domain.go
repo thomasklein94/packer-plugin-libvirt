@@ -31,9 +31,9 @@ func (s *stepStartDomain) Run(ctx context.Context, state multistep.StateBag) mul
 	}
 
 	if config.PackerDebug {
-		if console_alias := os.Getenv("PACKER_LIBVIRT_STREAM_CONSOLE"); console_alias != "" {
-			console_alias = fmt.Sprintf("ua-%s", console_alias)
-			go stream_console(driver, *domain, console_alias, log.Writer())
+		if consoleAlias := os.Getenv("PACKER_LIBVIRT_STREAM_CONSOLE"); consoleAlias != "" {
+			consoleAlias = fmt.Sprintf("ua-%s", consoleAlias)
+			go streamConsole(driver, *domain, consoleAlias, log.Writer())
 		}
 	}
 
@@ -46,9 +46,9 @@ func (s *stepStartDomain) Cleanup(state multistep.StateBag) {
 	domain := state.Get("domain").(*libvirt.Domain)
 	config := state.Get("config").(*Config)
 
-	domain_state, _, err := driver.DomainGetState(*domain, 0)
+	domainState, _, err := driver.DomainGetState(*domain, 0)
 
-	if libvirtutils.DomainStateMeansStopped(libvirt.DomainState(domain_state)) {
+	if libvirtutils.DomainStateMeansStopped(libvirt.DomainState(domainState)) {
 		log.Println("stepStartDomain.Cleanup: domain already stopped")
 		return
 	}
@@ -61,12 +61,12 @@ func (s *stepStartDomain) Cleanup(state multistep.StateBag) {
 		subCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		poll_errs := make(chan error, 1)
-		poll_results := make(chan libvirt.DomainState)
+		pollErrs := make(chan error, 1)
+		pollResults := make(chan libvirt.DomainState)
 		timeout := time.After(config.ShutdownTimeout)
 		period := 5 * time.Second
 
-		go libvirtutils.PollDomainState(subCtx, period, *driver, *domain, poll_results, poll_errs)
+		go libvirtutils.PollDomainState(subCtx, period, *driver, *domain, pollResults, pollErrs)
 
 	checks:
 		for {
@@ -76,7 +76,7 @@ func (s *stepStartDomain) Cleanup(state multistep.StateBag) {
 				ui.Error("Domain did not stopped in time")
 				break checks
 
-			case res := <-poll_results:
+			case res := <-pollResults:
 				if libvirtutils.DomainStateMeansStopped(res) {
 					if res == libvirt.DomainCrashed {
 						ui.Error("Domain crashed while waiting for a graceful shutdown")
@@ -86,7 +86,7 @@ func (s *stepStartDomain) Cleanup(state multistep.StateBag) {
 					break checks
 				}
 
-			case err := <-poll_errs:
+			case err := <-pollErrs:
 				ui.Error(fmt.Sprintf("Error while waiting for a clean shutdown: %s", err))
 				break checks
 
@@ -101,8 +101,8 @@ func (s *stepStartDomain) Cleanup(state multistep.StateBag) {
 	driver.DomainDestroy(*domain)
 }
 
-func stream_console(driver *libvirt.Libvirt, dom libvirt.Domain, device_alias string, stream io.Writer) error {
-	err := driver.DomainOpenConsole(dom, libvirt.OptString{device_alias}, stream, uint32(libvirt.DomainConsoleForce))
+func streamConsole(driver *libvirt.Libvirt, dom libvirt.Domain, devAlias string, stream io.Writer) error {
+	err := driver.DomainOpenConsole(dom, libvirt.OptString{devAlias}, stream, uint32(libvirt.DomainConsoleForce))
 
 	if err != nil {
 		return err

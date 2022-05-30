@@ -62,10 +62,10 @@ type Volume struct {
 	// will be used.
 	Format string `mapstructure:"format" required:"false"`
 
-	allow_unspecified_size bool `undocumented:"true"`
+	allowUnspecifiedSize bool `undocumented:"true"`
 }
 
-func (v *Volume) PrepareConfig(ctx *interpolate.Context, domain_name string) (warnings []string, errs []error) {
+func (v *Volume) PrepareConfig(ctx *interpolate.Context, domainName string) (warnings []string, errs []error) {
 	warnings = []string{}
 	errs = []error{}
 
@@ -87,9 +87,9 @@ func (v *Volume) PrepareConfig(ctx *interpolate.Context, domain_name string) (wa
 	}
 
 	if v.Source != nil {
-		source_warnings, source_errors := v.Source.PrepareConfig(ctx, v, domain_name)
-		warnings = append(warnings, source_warnings...)
-		errs = append(errs, source_errors...)
+		w, e := v.Source.PrepareConfig(ctx, v, domainName)
+		warnings = append(warnings, w...)
+		errs = append(errs, e...)
 	}
 
 	if v.Name == "" {
@@ -98,11 +98,11 @@ func (v *Volume) PrepareConfig(ctx *interpolate.Context, domain_name string) (wa
 		if postfix == "" {
 			postfix = xid.New().String()
 		}
-		v.Name = fmt.Sprintf("%s-%s", domain_name, postfix)
+		v.Name = fmt.Sprintf("%s-%s", domainName, postfix)
 		warnings = append(warnings, fmt.Sprintf("Volume name was not set, using '%s' as volume name instead.", v.Name))
 	}
 
-	if v.Size == "" && v.Capacity == "" && !v.allow_unspecified_size {
+	if v.Size == "" && v.Capacity == "" && !v.allowUnspecifiedSize {
 		errs = append(errs, fmt.Errorf("at least one of Volume.Size or Volume.Capacity must be set for volume %s/%s", v.Pool, v.Name))
 	}
 
@@ -122,27 +122,27 @@ func (v *Volume) StorageDefinitionXml() (*libvirtxml.StorageVolume, error) {
 	}
 
 	if v.Capacity != "" {
-		cap_val, cap_unit, err := fmtReadPostfixedValue(v.Capacity)
+		capVal, capUnit, err := fmtReadPostfixedValue(v.Capacity)
 
 		if err != nil {
 			return nil, fmt.Errorf("couldn't understand volume capacity '%s' : %s", v.Capacity, err)
 		}
 		storageDef.Capacity = &libvirtxml.StorageVolumeSize{
-			Value: cap_val,
-			Unit:  cap_unit,
+			Value: capVal,
+			Unit:  capUnit,
 		}
 	}
 
 	if v.Size != "" {
-		alloc_val, alloc_unit, err := fmtReadPostfixedValue(v.Size)
+		allocVal, allocUnit, err := fmtReadPostfixedValue(v.Size)
 
 		if err != nil {
 			return nil, fmt.Errorf("couldn't understand volume size '%s' : %s", v.Size, err)
 		}
 
 		storageDef.Allocation = &libvirtxml.StorageVolumeSize{
-			Value: alloc_val,
-			Unit:  alloc_unit,
+			Value: allocVal,
+			Unit:  allocUnit,
 		}
 	}
 

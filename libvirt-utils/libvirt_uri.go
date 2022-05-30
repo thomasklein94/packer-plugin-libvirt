@@ -52,14 +52,14 @@ func (uri *LibvirtUri) GetExtra(p LibvirtUriExtraParam) (string, bool) {
 }
 
 func (uri *LibvirtUri) Unmarshal(s string) error {
-	uri_regex := `^(?P<Driver>[a-z]+)(\+(?P<Transport>[a-z]+))?://(((?P<Username>[a-z]+)@)?(?P<Hostname>[-_.a-z0-9]+)(:(?P<Port>[0-9]+)?)?)?(?P<Path>/[-_.a-z0-9]+)?(\?(?P<extra>.*))?$`
-	re := regexp.MustCompile(uri_regex)
+	uriRegex := `^(?P<Driver>[a-z]+)(\+(?P<Transport>[a-z]+))?://(((?P<Username>[a-z]+)@)?(?P<Hostname>[-_.a-z0-9]+)(:(?P<Port>[0-9]+)?)?)?(?P<Path>/[-_.a-z0-9]+)?(\?(?P<extra>.*))?$`
+	re := regexp.MustCompile(uriRegex)
 
 	matches := allMatchedRegexpGroups(re, s)
 
 	if len(matches) == 0 {
-		test_uri_regex := `^(?P<Driver>test)://(?P<Username>)(?P<Hostname>)(?P<Port>)(?P<Path>(default|/[-_.a-z0-9/]+))?(\?(?P<extra>.*))?$`
-		re = regexp.MustCompile(test_uri_regex)
+		testUriRegex := `^(?P<Driver>test)://(?P<Username>)(?P<Hostname>)(?P<Port>)(?P<Path>(default|/[-_.a-z0-9/]+))?(\?(?P<extra>.*))?$`
+		re = regexp.MustCompile(testUriRegex)
 
 		matches = allMatchedRegexpGroups(re, s)
 
@@ -78,12 +78,12 @@ func (uri *LibvirtUri) Unmarshal(s string) error {
 
 	if len(matches["extra"]) > 0 {
 		for _, extra := range strings.Split(matches["extra"], "&") {
-			kv_pair := strings.Split(extra, "=")
-			if len(kv_pair) != 2 {
+			kvPair := strings.Split(extra, "=")
+			if len(kvPair) != 2 {
 				return fmt.Errorf("can't parse extra parameters string '%s'", extra)
 			}
 
-			uri.ExtraParams[kv_pair[0]] = kv_pair[1]
+			uri.ExtraParams[kvPair[0]] = kvPair[1]
 		}
 	}
 
@@ -134,10 +134,10 @@ func (uri *LibvirtUri) Marshal() (result string) {
 }
 
 func (uri *LibvirtUri) Name() (result string) {
-	name_param_present := false
-	result, name_param_present = uri.GetExtra(LibvirtUriParam_Name)
+	nameParamPresent := false
+	result, nameParamPresent = uri.GetExtra(LibvirtUriParam_Name)
 
-	if !name_param_present {
+	if !nameParamPresent {
 		result = fmt.Sprintf("%s://%s", uri.Driver, uri.Path)
 	}
 

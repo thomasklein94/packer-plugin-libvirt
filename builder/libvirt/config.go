@@ -118,78 +118,25 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	}
 
 	for i, volumeDef := range c.Volumes {
-		volume_warnings, volume_errors := volumeDef.PrepareConfig(&c.ctx, c.DomainName)
-		warnings = append(warnings, volume_warnings...)
-		errs = packersdk.MultiErrorAppend(errs, volume_errors...)
+		w, e := volumeDef.PrepareConfig(&c.ctx, c.DomainName)
+		warnings = append(warnings, w...)
+		errs = packersdk.MultiErrorAppend(errs, e...)
 		c.Volumes[i] = volumeDef
 	}
 
 	for i, ni := range c.NetworkInterfaces {
-		network_warnings, network_errors := ni.PrepareConfig(&c.ctx)
-		warnings = append(warnings, network_warnings...)
-		errs = packersdk.MultiErrorAppend(errs, network_errors...)
+		w, e := ni.PrepareConfig(&c.ctx)
+		warnings = append(warnings, w...)
+		errs = packersdk.MultiErrorAppend(errs, e...)
 		c.NetworkInterfaces[i] = ni
 	}
 
-	user_defined_communicator_interface := c.CommunicatorInterface
-	if c.CommunicatorInterface == "" {
-		c.CommunicatorInterface = "communicator"
-	}
-	// Libvirt only accepts alias with the prefix `ua-`
-	c.CommunicatorInterface = fmt.Sprintf("ua-%s", c.CommunicatorInterface)
-
-	if len(c.NetworkInterfaces) == 0 {
-		warnings = append(warnings, "No network interface defined")
-	} else {
-		communicator_interface_found := false
-		for _, ni := range c.NetworkInterfaces {
-			if ni.Alias == c.CommunicatorInterface {
-				communicator_interface_found = true
-				break
-			}
-		}
-		if !communicator_interface_found {
-			if user_defined_communicator_interface != "" {
-				errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("no network_interface found with alias '%s'", user_defined_communicator_interface))
-			} else {
-				warnings = append(warnings, "using first network interface found as communicator interface")
-				ni0 := c.NetworkInterfaces[0]
-				ni0.Alias = c.CommunicatorInterface
-				c.NetworkInterfaces[0] = ni0
-			}
-		}
-	}
+	warnings, errs = c.prepareCommunicator(warnings, errs)
 
 	if len(c.Volumes) == 0 {
 		errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("no volume has been specified"))
 	} else {
-		user_defined_artifact_alias := c.ArtifactVolumeAlias
-		if user_defined_artifact_alias == "" {
-			c.ArtifactVolumeAlias = "artifact"
-		}
-		// Libvirt only accepts alias with the prefix `ua-`
-		c.ArtifactVolumeAlias = fmt.Sprintf("ua-%s", c.ArtifactVolumeAlias)
-
-		volume_found := false
-		for _, vol := range c.Volumes {
-			// As a part of the volume.PrepareConfig call above, alias will also be prefixed with `ua-` at this point
-			if vol.Alias == c.ArtifactVolumeAlias {
-				volume_found = true
-				break
-			}
-		}
-		if !volume_found {
-			if user_defined_artifact_alias != "" {
-				errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("no volume found with alias '%s'", user_defined_artifact_alias))
-			} else if len(c.Volumes) == 1 {
-				warnings = append(warnings, "Using the only defined volume as an artifact")
-				vol0 := c.Volumes[0]
-				vol0.Alias = c.ArtifactVolumeAlias
-				c.Volumes[0] = vol0
-			} else {
-				errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("please specify an alias for a volume and set artifact_volume_alias on the builder"))
-			}
-		}
+		errs, warnings = c.prepareArtifactVolume(errs, warnings)
 	}
 
 	if c.NetworkAddressSource == "" {
@@ -219,4 +166,68 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	}
 
 	return warnings, nil
+}
+
+func (c *Config) prepareArtifactVolume(errs *packersdk.MultiError, warnings []string) (*packersdk.MultiError, []string) {
+	original := c.ArtifactVolumeAlias
+	if original == "" {
+		c.ArtifactVolumeAlias = "artifact"
+	}
+
+	c.ArtifactVolumeAlias = fmt.Sprintf("ua-%s", c.ArtifactVolumeAlias)
+
+	found := false
+	for _, vol := range c.Volumes {
+
+		if vol.Alias == c.ArtifactVolumeAlias {
+			found = true
+			break
+		}
+	}
+	if !found {
+		if original != "" {
+			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("no volume found with alias '%s'", original))
+		} else if len(c.Volumes) == 1 {
+			warnings = append(warnings, "Using the only defined volume as an artifact")
+			vol0 := c.Volumes[0]
+			vol0.Alias = c.ArtifactVolumeAlias
+			c.Volumes[0] = vol0
+		} else {
+			errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("please specify an alias for a volume and set artifact_volume_alias on the builder"))
+		}
+	}
+	return errs, warnings
+}
+
+func (c *Config) prepareCommunicator(warnings []string, errs *packersdk.MultiError) ([]string, *packersdk.MultiError) {
+	original := c.CommunicatorInterface
+	if c.CommunicatorInterface == "" {
+		c.CommunicatorInterface = "communicator"
+	}
+
+	// Libvirt only accepts alias with the prefix `ua-`
+	c.CommunicatorInterface = fmt.Sprintf("ua-%s", c.CommunicatorInterface)
+
+	if len(c.NetworkInterfaces) == 0 {
+		warnings = append(warnings, "No network interface defined")
+	} else {
+		found := false
+		for _, ni := range c.NetworkInterfaces {
+			if ni.Alias == c.CommunicatorInterface {
+				found = true
+				break
+			}
+		}
+		if !found {
+			if original != "" {
+				errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("no network_interface found with alias '%s'", original))
+			} else {
+				warnings = append(warnings, "using first network interface found as communicator interface")
+				ni0 := c.NetworkInterfaces[0]
+				ni0.Alias = c.CommunicatorInterface
+				c.NetworkInterfaces[0] = ni0
+			}
+		}
+	}
+	return warnings, errs
 }

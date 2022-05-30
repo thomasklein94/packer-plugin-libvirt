@@ -29,16 +29,16 @@ func (pctx *PreparationContext) CreateVolume() error {
 		return fmt.Errorf("CreateVolume: Volume already exists")
 	}
 
-	volume_xml, err := pctx.VolumeDefinition.Marshal()
+	volumeXML, err := pctx.VolumeDefinition.Marshal()
 	if err != nil {
 		return fmt.Errorf("CreateVolume.Marshal: %s", err)
 	}
 
 	if pctx.State.Get("debug").(bool) {
-		log.Printf("Volume definition XML:\n%s\n", volume_xml)
+		log.Printf("Volume definition XML:\n%s\n", volumeXML)
 	}
 
-	ref, err := pctx.Driver.StorageVolCreateXML(*pctx.PoolRef, volume_xml, 0)
+	ref, err := pctx.Driver.StorageVolCreateXML(*pctx.PoolRef, volumeXML, 0)
 	if err != nil {
 		return fmt.Errorf("CreateVolume.RPC: %s", err)
 	}
@@ -49,7 +49,7 @@ func (pctx *PreparationContext) CreateVolume() error {
 	return nil
 }
 
-func (pctx *PreparationContext) CloneVolumeFrom(source_pool libvirt.StoragePool, source_vol libvirt.StorageVol) error {
+func (pctx *PreparationContext) CloneVolumeFrom(sourcePool libvirt.StoragePool, sourceVol libvirt.StorageVol) error {
 	if pctx.VolumeRef != nil {
 		return fmt.Errorf("CreateVolumeFrom: Volume already exists")
 	}
@@ -58,12 +58,12 @@ func (pctx *PreparationContext) CloneVolumeFrom(source_pool libvirt.StoragePool,
 		return fmt.Errorf("can't simultaneously clone a volume and use a backing store")
 	}
 
-	volume_xml, err := pctx.VolumeDefinition.Marshal()
+	volumeXML, err := pctx.VolumeDefinition.Marshal()
 	if err != nil {
 		return fmt.Errorf("CreateVolumeFrom.Marshal: %s", err)
 	}
 
-	ref, err := pctx.Driver.StorageVolCreateXMLFrom(source_pool, volume_xml, source_vol, 0)
+	ref, err := pctx.Driver.StorageVolCreateXMLFrom(sourcePool, volumeXML, sourceVol, 0)
 	if err != nil {
 		return fmt.Errorf("CreateVolumeFrom.RPC: %s", err)
 	}

@@ -92,67 +92,67 @@ func sshSetAddress(uri LibvirtUri, dialer *SshDialer) error {
 
 func sshDialerSetPrivateKey(uri LibvirtUri, dialer *SshDialer) (err error) {
 
-	key_path, ok := uri.GetExtra(LibvirtUriParam_Keyfile)
+	keyPath, ok := uri.GetExtra(LibvirtUriParam_Keyfile)
 	if !ok {
 		return fmt.Errorf("ssh transport requires %s parameter", LibvirtUriParam_Keyfile)
 	}
 
-	expanded_key_path, err := pathing.ExpandUser(key_path)
+	expandedKeyPath, err := pathing.ExpandUser(keyPath)
 
 	if err != nil {
 		return err
 	}
 
-	key, err := ioutil.ReadFile(expanded_key_path)
+	key, err := ioutil.ReadFile(expandedKeyPath)
 
 	if err != nil {
 		return err
 	}
 
-	parsed_key, err := ssh.ParsePrivateKey(key)
+	parsedKey, err := ssh.ParsePrivateKey(key)
 
 	if err != nil {
 		return err
 	}
 
-	dialer.sshConfig.Auth = append(dialer.sshConfig.Auth, ssh.PublicKeys(parsed_key))
+	dialer.sshConfig.Auth = append(dialer.sshConfig.Auth, ssh.PublicKeys(parsedKey))
 
 	return
 }
 
 func sshDialerSetVerification(uri LibvirtUri, dialer *SshDialer) error {
-	no_verify := false
+	noVerify := false
 
-	if no_verify_string, ok := uri.GetExtra(LibvirtUriParam_NoVerify); ok {
-		no_verify_num, err := strconv.Atoi(no_verify_string)
+	if noVerifyString, ok := uri.GetExtra(LibvirtUriParam_NoVerify); ok {
+		noVerifyNum, err := strconv.Atoi(noVerifyString)
 		if err != nil {
 			return err
 		}
-		no_verify = no_verify_num > 0
+		noVerify = noVerifyNum != 0
 	}
 
-	if no_verify {
+	if noVerify {
 		dialer.sshConfig.HostKeyCallback = ssh.InsecureIgnoreHostKey()
 		return nil
 	}
 
-	known_host_path, ok := uri.GetExtra(LibvirtUriParam_KnownHost)
+	knownHostPath, ok := uri.GetExtra(LibvirtUriParam_KnownHost)
 
 	if !ok {
 		return fmt.Errorf("either %s=1 must be specified, or %s must be a path", LibvirtUriParam_NoVerify, LibvirtUriParam_KnownHost)
 	}
 
-	expanded_known_host_path, err := pathing.ExpandUser(known_host_path)
+	expandedKnownHostPath, err := pathing.ExpandUser(knownHostPath)
 
 	if err != nil {
 		return err
 	}
 
-	host_key_callback, err := knownhosts.New(expanded_known_host_path)
+	hostKeyCallback, err := knownhosts.New(expandedKnownHostPath)
 	if err != nil {
 		return err
 	}
 
-	dialer.sshConfig.HostKeyCallback = host_key_callback
+	dialer.sshConfig.HostKeyCallback = hostKeyCallback
 	return nil
 }

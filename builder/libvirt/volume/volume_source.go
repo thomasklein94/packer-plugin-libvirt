@@ -19,12 +19,12 @@ type VolumeSource struct {
 	CloningVolume CloningVolumeSource      `mapstructure:",squash"`
 }
 
-func (vs *VolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Volume, domain_name string) (warnings []string, errs []error) {
+func (vs *VolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Volume, domainName string) (warnings []string, errs []error) {
 	switch vs.Type {
 	case "http":
 		return vs.Http.PrepareConfig(ctx, vol)
 	case "cloud-init", "cloudinit":
-		return vs.CloudInit.PrepareConfig(ctx, vol, domain_name)
+		return vs.CloudInit.PrepareConfig(ctx, vol, domainName)
 	case "backing-store", "backingstore":
 		return vs.BackingStore.PrepareConfig(ctx, vol)
 	case "cloning", "clone":

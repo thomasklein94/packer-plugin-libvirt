@@ -16,9 +16,9 @@ type TlsDialer struct {
 }
 
 const (
-	Pki_CaCert     = "cacert.pem"
-	Pki_ClientCert = "clientcert.pem"
-	Pki_ClientKey  = "clientkey.pem"
+	pkiCACert     = "cacert.pem"
+	pkiClientCert = "clientcert.pem"
+	pkiClientKey  = "clientkey.pem"
 )
 
 func (dialer *TlsDialer) Dial() (net.Conn, error) {
@@ -41,44 +41,44 @@ func newTlsDialer(uri LibvirtUri) (dialer *TlsDialer, err error) {
 }
 
 func tlsDialerSetVerification(uri LibvirtUri, dialer *TlsDialer) error {
-	no_verify := false
+	noVerify := false
 
-	if no_verify_string, ok := uri.GetExtra(LibvirtUriParam_NoVerify); ok {
-		no_verify_num, err := strconv.Atoi(no_verify_string)
+	if noVerifyString, ok := uri.GetExtra(LibvirtUriParam_NoVerify); ok {
+		noVerifyNum, err := strconv.Atoi(noVerifyString)
 		if err != nil {
 			return err
 		}
-		no_verify = no_verify_num > 0
+		noVerify = noVerifyNum > 0
 	}
 
-	dialer.tlsConfig.InsecureSkipVerify = no_verify
+	dialer.tlsConfig.InsecureSkipVerify = noVerify
 
-	if no_verify {
+	if noVerify {
 		return nil
 	}
 
-	pki_path, ok := uri.GetExtra(LibvirtUriParam_PkiPath)
+	pkiPath, ok := uri.GetExtra(LibvirtUriParam_PkiPath)
 
 	if !ok {
 		return fmt.Errorf("either %s=1 must be specified, or %s must be a path to a directory", LibvirtUriParam_NoVerify, LibvirtUriParam_PkiPath)
 	}
 
 	// CAcert
-	cacert_path := filepath.Join(pki_path, Pki_CaCert)
-	cacert, err := ioutil.ReadFile(cacert_path)
+	caCertPath := filepath.Join(pkiPath, pkiCACert)
+	caCert, err := ioutil.ReadFile(caCertPath)
 
 	if err != nil {
 		return err
 	}
 
 	dialer.tlsConfig.RootCAs = x509.NewCertPool()
-	dialer.tlsConfig.RootCAs.AppendCertsFromPEM(cacert)
+	dialer.tlsConfig.RootCAs.AppendCertsFromPEM(caCert)
 
 	// Client cert and key
 
-	clientcert_path := filepath.Join(pki_path, Pki_ClientCert)
-	keyfile_path := filepath.Join(pki_path, Pki_ClientKey)
-	keypair, err := tls.LoadX509KeyPair(clientcert_path, keyfile_path)
+	clientCertPath := filepath.Join(pkiPath, pkiClientCert)
+	keyfilePath := filepath.Join(pkiPath, pkiClientKey)
+	keypair, err := tls.LoadX509KeyPair(clientCertPath, keyfilePath)
 
 	if err != nil {
 		return err

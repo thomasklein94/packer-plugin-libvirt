@@ -62,11 +62,11 @@ func (s *stepPrepareVolumes) Cleanup(state multistep.StateBag) {
 	for _, pctx := range s.preparations {
 		log.Printf("Checking volume %s/%s for cleanup\n", pctx.VolumeConfig.Pool, pctx.VolumeConfig.Name)
 		if pctx.VolumeRef != nil && pctx.VolumeIsCreated {
-			abort, abort_set := state.GetOk("aborted")
+			abort, abortSet := state.GetOk("aborted")
 			_, canceled := state.GetOk(multistep.StateCancelled)
 			_, halted := state.GetOk(multistep.StateHalted)
 
-			delete := !pctx.VolumeIsArtifact || (abort_set && abort.(bool)) || canceled || halted
+			delete := !pctx.VolumeIsArtifact || (abortSet && abort.(bool)) || canceled || halted
 
 			if delete {
 				pctx.Ui.Message(fmt.Sprintf("Cleaning up volume %s/%s", pctx.VolumeRef.Pool, pctx.VolumeRef.Name))

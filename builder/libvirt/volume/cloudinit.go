@@ -30,12 +30,12 @@ type CloudInitSource struct {
 	NetworkConfig *string `mapstructure:"network_config"`
 }
 
-func (vs *CloudInitSource) PrepareConfig(ctx *interpolate.Context, vol *Volume, domain_name string) (warnings []string, errs []error) {
+func (vs *CloudInitSource) PrepareConfig(ctx *interpolate.Context, vol *Volume, domainName string) (warnings []string, errs []error) {
 	if vol.Name == "" {
-		vol.Name = fmt.Sprintf("%s-cloudinit", domain_name)
+		vol.Name = fmt.Sprintf("%s-cloudinit", domainName)
 	}
 
-	vol.allow_unspecified_size = true
+	vol.allowUnspecifiedSize = true
 
 	return
 }
@@ -67,54 +67,54 @@ func (vs *CloudInitSource) PrepareVolume(pctx *PreparationContext) multistep.Ste
 	// A better solution to this should be implemented later
 
 	pctx.Ui.Message(fmt.Sprintf("Assembling CloudInit image %s/%s", pctx.VolumeConfig.Pool, pctx.VolumeConfig.Name))
-	create_step := commonsteps.StepCreateCD{
+	createStep := commonsteps.StepCreateCD{
 		Label:   "cidata",
 		Content: map[string]string{},
 	}
 
 	if vs.MetaData == nil {
 		domainDef := pctx.State.Get("domain_def").(*libvirtxml.Domain)
-		default_metadata := fmt.Sprintf("instance_id: %s\n", domainDef.Name)
+		defaultMetadata := fmt.Sprintf("instance_id: %s\n", domainDef.Name)
 
-		vs.MetaData = &default_metadata
+		vs.MetaData = &defaultMetadata
 	}
 
 	if *vs.MetaData != "" {
-		create_step.Content["meta-data"] = *vs.MetaData
+		createStep.Content["meta-data"] = *vs.MetaData
 	}
 	if vs.UserData != nil {
-		create_step.Content["user-data"] = *vs.UserData
+		createStep.Content["user-data"] = *vs.UserData
 	}
 	if vs.NetworkConfig != nil {
-		create_step.Content["network-config"] = *vs.NetworkConfig
+		createStep.Content["network-config"] = *vs.NetworkConfig
 	}
 
-	// temp_state := new(multistep.StateBag)
-	temp_state := &multistep.BasicStateBag{}
-	temp_state.Put("ui", pctx.Ui)
+	// tempState := new(multistep.StateBag)
+	tempState := &multistep.BasicStateBag{}
+	tempState.Put("ui", pctx.Ui)
 
-	action := create_step.Run(pctx.Context, temp_state)
+	action := createStep.Run(pctx.Context, tempState)
 	if action != multistep.ActionContinue {
 		err := fmt.Errorf("unknown Error")
-		raw_step_error, ok := temp_state.GetOk("error")
+		rawStepError, ok := tempState.GetOk("error")
 		if ok {
-			err = raw_step_error.(error)
+			err = rawStepError.(error)
 		}
 		return pctx.HaltOnError(err, "Couldn't produce a CloudInit ISO: %s", err)
 	}
-	cd_path := temp_state.Get("cd_path").(string)
+	cdPath := tempState.Get("cd_path").(string)
 
-	fptr, err := os.Open(cd_path)
+	fPtr, err := os.Open(cdPath)
 	if err != nil {
 		pctx.HaltOnError(err, "CloudInit.Open: %s", err)
 	}
 
-	finfo, err := fptr.Stat()
+	fInfo, err := fPtr.Stat()
 	if err != nil {
 		pctx.HaltOnError(err, "CloudInit.Stat: %s", err)
 	}
 
-	size := uint64(finfo.Size())
+	size := uint64(fInfo.Size())
 	pctx.VolumeDefinition.Capacity = &libvirtxml.StorageVolumeSize{
 		Value: size,
 		Unit:  "B",
@@ -127,13 +127,13 @@ func (vs *CloudInitSource) PrepareVolume(pctx *PreparationContext) multistep.Ste
 		return pctx.HaltOnError(err, "%s", err)
 	}
 
-	err = pctx.Driver.StorageVolUpload(*pctx.VolumeRef, fptr, 0, size, 0)
+	err = pctx.Driver.StorageVolUpload(*pctx.VolumeRef, fPtr, 0, size, 0)
 
 	if err != nil {
-		connect_uri, _ := pctx.Driver.ConnectGetUri()
+		connectUri, _ := pctx.Driver.ConnectGetUri()
 
 		// The test backend does not support Volume Uploads, so
-		if connect_uri[0:4] == "test" {
+		if connectUri[0:4] == "test" {
 			pctx.Ui.Error(fmt.Sprintf("CloudInit.Upload: %s", err))
 		} else {
 			return pctx.HaltOnError(err, "CloudInit.Upload: %s", err)
@@ -146,11 +146,11 @@ func (vs *CloudInitSource) PrepareVolume(pctx *PreparationContext) multistep.Ste
 		log.Printf("Error while refreshing volume definition: %s\n", err)
 	}
 
-	if err := fptr.Close(); err != nil {
+	if err := fPtr.Close(); err != nil {
 		log.Println("Error closing CD stream")
 	}
 
-	create_step.Cleanup(temp_state)
+	createStep.Cleanup(tempState)
 
 	return multistep.ActionContinue
 }

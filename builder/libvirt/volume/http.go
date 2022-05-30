@@ -59,10 +59,10 @@ func (vs *HttpVolumeSource) PrepareVolume(pctx *PreparationContext) multistep.St
 	err = pctx.Driver.StorageVolUpload(*pctx.VolumeRef, response.Body, 0, allocation, libvirt.StorageVolUploadSparseStream)
 
 	if err != nil {
-		connect_uri, _ := pctx.Driver.ConnectGetUri()
+		connectUri, _ := pctx.Driver.ConnectGetUri()
 
 		// The test backend does not support Volume Uploads, so
-		if connect_uri[0:4] == "test" {
+		if connectUri[0:4] == "test" {
 			pctx.Ui.Error(fmt.Sprintf("Error during volume streaming: %s", err))
 		} else {
 			return pctx.HaltOnError(err, "Error during volume streaming: %s", err)
