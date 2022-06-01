@@ -86,25 +86,27 @@ func (*FlatCloudInitSource) HCL2Spec() map[string]hcldec.Spec {
 	return s
 }
 
-// FlatHttpVolumeSource is an auto-generated flat version of HttpVolumeSource.
+// FlatExternalVolumeSource is an auto-generated flat version of ExternalVolumeSource.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
-type FlatHttpVolumeSource struct {
-	Url *string `mapstructure:"url" required:"false" cty:"url" hcl:"url"`
+type FlatExternalVolumeSource struct {
+	Checksum *string  `mapstructure:"checksum" cty:"checksum" hcl:"checksum"`
+	Urls     []string `mapstructure:"urls" cty:"urls" hcl:"urls"`
 }
 
-// FlatMapstructure returns a new FlatHttpVolumeSource.
-// FlatHttpVolumeSource is an auto-generated flat version of HttpVolumeSource.
+// FlatMapstructure returns a new FlatExternalVolumeSource.
+// FlatExternalVolumeSource is an auto-generated flat version of ExternalVolumeSource.
 // Where the contents a fields with a `mapstructure:,squash` tag are bubbled up.
-func (*HttpVolumeSource) FlatMapstructure() interface{ HCL2Spec() map[string]hcldec.Spec } {
-	return new(FlatHttpVolumeSource)
+func (*ExternalVolumeSource) FlatMapstructure() interface{ HCL2Spec() map[string]hcldec.Spec } {
+	return new(FlatExternalVolumeSource)
 }
 
-// HCL2Spec returns the hcl spec of a HttpVolumeSource.
-// This spec is used by HCL to read the fields of HttpVolumeSource.
-// The decoded values from this spec will then be applied to a FlatHttpVolumeSource.
-func (*FlatHttpVolumeSource) HCL2Spec() map[string]hcldec.Spec {
+// HCL2Spec returns the hcl spec of a ExternalVolumeSource.
+// This spec is used by HCL to read the fields of ExternalVolumeSource.
+// The decoded values from this spec will then be applied to a FlatExternalVolumeSource.
+func (*FlatExternalVolumeSource) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
-		"url": &hcldec.AttrSpec{Name: "url", Type: cty.String, Required: false},
+		"checksum": &hcldec.AttrSpec{Name: "checksum", Type: cty.String, Required: false},
+		"urls":     &hcldec.AttrSpec{Name: "urls", Type: cty.List(cty.String), Required: false},
 	}
 	return s
 }
@@ -153,14 +155,15 @@ func (*FlatVolume) HCL2Spec() map[string]hcldec.Spec {
 // FlatVolumeSource is an auto-generated flat version of VolumeSource.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatVolumeSource struct {
-	Type          *string `mapstructure:"type" required:"true" cty:"type" hcl:"type"`
-	Url           *string `mapstructure:"url" required:"false" cty:"url" hcl:"url"`
-	MetaData      *string `mapstructure:"meta_data" cty:"meta_data" hcl:"meta_data"`
-	UserData      *string `mapstructure:"user_data" cty:"user_data" hcl:"user_data"`
-	NetworkConfig *string `mapstructure:"network_config" cty:"network_config" hcl:"network_config"`
-	Pool          *string `mapstucture:"pool" required:"false" cty:"pool" hcl:"pool"`
-	Volume        *string `mapstructure:"volume" required:"false" cty:"volume" hcl:"volume"`
-	Path          *string `mapstructure:"path" required:"false" cty:"path" hcl:"path"`
+	Type          *string  `mapstructure:"type" required:"true" cty:"type" hcl:"type"`
+	Checksum      *string  `mapstructure:"checksum" cty:"checksum" hcl:"checksum"`
+	Urls          []string `mapstructure:"urls" cty:"urls" hcl:"urls"`
+	MetaData      *string  `mapstructure:"meta_data" cty:"meta_data" hcl:"meta_data"`
+	UserData      *string  `mapstructure:"user_data" cty:"user_data" hcl:"user_data"`
+	NetworkConfig *string  `mapstructure:"network_config" cty:"network_config" hcl:"network_config"`
+	Pool          *string  `mapstucture:"pool" required:"false" cty:"pool" hcl:"pool"`
+	Volume        *string  `mapstructure:"volume" required:"false" cty:"volume" hcl:"volume"`
+	Path          *string  `mapstructure:"path" required:"false" cty:"path" hcl:"path"`
 }
 
 // FlatMapstructure returns a new FlatVolumeSource.
@@ -176,7 +179,8 @@ func (*VolumeSource) FlatMapstructure() interface{ HCL2Spec() map[string]hcldec.
 func (*FlatVolumeSource) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
 		"type":           &hcldec.AttrSpec{Name: "type", Type: cty.String, Required: false},
-		"url":            &hcldec.AttrSpec{Name: "url", Type: cty.String, Required: false},
+		"checksum":       &hcldec.AttrSpec{Name: "checksum", Type: cty.String, Required: false},
+		"urls":           &hcldec.AttrSpec{Name: "urls", Type: cty.List(cty.String), Required: false},
 		"meta_data":      &hcldec.AttrSpec{Name: "meta_data", Type: cty.String, Required: false},
 		"user_data":      &hcldec.AttrSpec{Name: "user_data", Type: cty.String, Required: false},
 		"network_config": &hcldec.AttrSpec{Name: "network_config", Type: cty.String, Required: false},

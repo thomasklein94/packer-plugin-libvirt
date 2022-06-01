@@ -11,9 +11,8 @@ import (
 )
 
 type VolumeSource struct {
-	Type string `mapstructure:"type" required:"true"`
-	// BackingStore BackingStoreVolumeSource `mapstructure:",squash"`
-	Http          HttpVolumeSource         `mapstructure:",squash"`
+	Type          string                   `mapstructure:"type" required:"true"`
+	External      ExternalVolumeSource     `mapstructure:",squash"`
 	CloudInit     CloudInitSource          `mapstructure:",squash"`
 	BackingStore  BackingStoreVolumeSource `mapstructure:",squash"`
 	CloningVolume CloningVolumeSource      `mapstructure:",squash"`
@@ -21,8 +20,8 @@ type VolumeSource struct {
 
 func (vs *VolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Volume, domainName string) (warnings []string, errs []error) {
 	switch vs.Type {
-	case "http":
-		return vs.Http.PrepareConfig(ctx, vol)
+	case "external":
+		return vs.External.PrepareConfig(ctx, vol)
 	case "cloud-init", "cloudinit":
 		return vs.CloudInit.PrepareConfig(ctx, vol, domainName)
 	case "backing-store", "backingstore":
@@ -37,8 +36,8 @@ func (vs *VolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Volume, dom
 
 func (vs *VolumeSource) UpdateDomainDiskXml(domainDisk *libvirtxml.DomainDisk) {
 	switch vs.Type {
-	case "http":
-		vs.Http.UpdateDomainDiskXml(domainDisk)
+	case "external":
+		vs.External.UpdateDomainDiskXml(domainDisk)
 	case "cloud-init", "cloudinit":
 		vs.CloudInit.UpdateDomainDiskXml(domainDisk)
 	case "backing-store", "backingstore":
@@ -50,8 +49,8 @@ func (vs *VolumeSource) UpdateDomainDiskXml(domainDisk *libvirtxml.DomainDisk) {
 
 func (vs *VolumeSource) UpdateStorageDefinitionXml(storageDef *libvirtxml.StorageVolume) {
 	switch vs.Type {
-	case "http":
-		vs.Http.UpdateStorageDefinitionXml(storageDef)
+	case "external":
+		vs.External.UpdateStorageDefinitionXml(storageDef)
 	case "cloud-init", "cloudinit":
 		vs.CloudInit.UpdateStorageDefinitionXml(storageDef)
 	case "backing-store", "backingstore":
@@ -63,8 +62,8 @@ func (vs *VolumeSource) UpdateStorageDefinitionXml(storageDef *libvirtxml.Storag
 
 func (vs *VolumeSource) PrepareVolume(pctx *PreparationContext) multistep.StepAction {
 	switch vs.Type {
-	case "http":
-		return vs.Http.PrepareVolume(pctx)
+	case "external":
+		return vs.External.PrepareVolume(pctx)
 	case "cloud-init", "cloudinit":
 		return vs.CloudInit.PrepareVolume(pctx)
 	case "backing-store", "backingstore":

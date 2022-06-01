@@ -165,13 +165,10 @@ volume {
 }
 ```
 
-#### HTTP volume source
-Libvirt builder can download and restream a volume from a web source to the libvirt host.
-** Important: ** The file will be downloaded from the machine running packer and without caching, it will be directly
-restreamed to libvirt as a volume. For moving large files, make sure you have the necessary download and upload 
-bandwidth.
+#### External volume source
 
-@include 'builder/libvirt/volume/HttpVolumeSource-not-required.mdx'
+@include 'builder/libvirt/volume/ExternalVolumeSource.mdx'
+@include 'builder/libvirt/volume/ExternalVolumeSource-not-required.mdx'
 
 Example:
 
@@ -183,8 +180,9 @@ volume {
   name = "ubuntu-22.04-lts"
 
   source {
-    type   = "http"
-    url    = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
+    type     = "external"
+    urls     = ["https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"]
+    checksum = "2a0d8745dee674a7f3038d627d39ff68e5d7276f97866a4abd9ebfcb3df5fa05"
   }
 
   format = "qcow2"

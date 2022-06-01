@@ -10,8 +10,8 @@ build {
       name = "ubuntu-22.04-lts"
 
       source {
-        type   = "http"
-        url    = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
+        type   = "external"
+        urls   = ["https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"]
       }
 
       capacity = "1G"
