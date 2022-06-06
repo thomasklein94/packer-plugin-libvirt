@@ -22,6 +22,10 @@ type FlatConfig struct {
 	PackerUserVars        map[string]string              `mapstructure:"packer_user_variables" cty:"packer_user_variables" hcl:"packer_user_variables"`
 	PackerSensitiveVars   []string                       `mapstructure:"packer_sensitive_variables" cty:"packer_sensitive_variables" hcl:"packer_sensitive_variables"`
 	Communicator          *communicator.FlatConfig       `mapstructure:"communicator" cty:"communicator" hcl:"communicator"`
+	BootGroupInterval     *string                        `mapstructure:"boot_keygroup_interval" cty:"boot_keygroup_interval" hcl:"boot_keygroup_interval"`
+	BootWait              *string                        `mapstructure:"boot_wait" cty:"boot_wait" hcl:"boot_wait"`
+	BootCommand           []string                       `mapstructure:"boot_command" cty:"boot_command" hcl:"boot_command"`
+	KeyHoldType           *string                        `mapstructure:"key_hold_time" cty:"key_hold_time" hcl:"key_hold_time"`
 	DomainName            *string                        `mapstructure:"domain_name" required:"false" cty:"domain_name" hcl:"domain_name"`
 	MemorySize            *int                           `mapstructure:"memory" required:"false" cty:"memory" hcl:"memory"`
 	CpuCount              *int                           `mapstructure:"vcpu" required:"false" cty:"vcpu" hcl:"vcpu"`
@@ -57,6 +61,10 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"packer_user_variables":      &hcldec.AttrSpec{Name: "packer_user_variables", Type: cty.Map(cty.String), Required: false},
 		"packer_sensitive_variables": &hcldec.AttrSpec{Name: "packer_sensitive_variables", Type: cty.List(cty.String), Required: false},
 		"communicator":               &hcldec.BlockSpec{TypeName: "communicator", Nested: hcldec.ObjectSpec((*communicator.FlatConfig)(nil).HCL2Spec())},
+		"boot_keygroup_interval":     &hcldec.AttrSpec{Name: "boot_keygroup_interval", Type: cty.String, Required: false},
+		"boot_wait":                  &hcldec.AttrSpec{Name: "boot_wait", Type: cty.String, Required: false},
+		"boot_command":               &hcldec.AttrSpec{Name: "boot_command", Type: cty.List(cty.String), Required: false},
+		"key_hold_time":              &hcldec.AttrSpec{Name: "key_hold_time", Type: cty.String, Required: false},
 		"domain_name":                &hcldec.AttrSpec{Name: "domain_name", Type: cty.String, Required: false},
 		"memory":                     &hcldec.AttrSpec{Name: "memory", Type: cty.Number, Required: false},
 		"vcpu":                       &hcldec.AttrSpec{Name: "vcpu", Type: cty.Number, Required: false},

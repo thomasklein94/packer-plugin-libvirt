@@ -10,6 +10,7 @@ require (
 	github.com/rs/xid v1.4.0
 	github.com/zclconf/go-cty v1.10.0
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
+	golang.org/x/mobile v0.0.0-20210901025245-1fde1d6c3ca1
 )
 
 require (

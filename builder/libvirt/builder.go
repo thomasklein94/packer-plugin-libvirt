@@ -52,6 +52,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		&stepPrepareVolumes{},
 		&stepDefineDomain{},
 		&stepStartDomain{},
+		&stepTypeBootCommand{},
 	)
 
 	switch b.config.Communicator.Type {

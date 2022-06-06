@@ -23,7 +23,8 @@ type Config struct {
 	// Communicator configuration
 	// See [Packer's documentation](https://www.packer.io/docs/communicators) for more.
 	Communicator communicator.Config `mapstructure:"communicator"`
-
+	//
+	BootConfig BootConfig `mapstructure:",squash"`
 	// The libvirt name of the domain (virtual machine) running your build
 	// If not specified, a random name with the prefix `packer-` will be used
 	DomainName string `mapstructure:"domain_name" required:"false"`
