@@ -32,6 +32,8 @@ func (vs *ExternalVolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Vol
 		errs = append(errs, fmt.Errorf("at least 1 URL must be specified for an external volume source"))
 	}
 
+	vol.allowUnspecifiedSize = true
+
 	return
 }
 
@@ -69,6 +71,11 @@ func (vs *ExternalVolumeSource) PrepareVolume(pctx *PreparationContext) multiste
 	}
 
 	pctx.VolumeDefinition.Allocation = &libvirtxml.StorageVolumeSize{
+		Value: uint64(stat.Size()),
+		Unit:  "B",
+	}
+
+	pctx.VolumeDefinition.Capacity = &libvirtxml.StorageVolumeSize{
 		Value: uint64(stat.Size()),
 		Unit:  "B",
 	}
