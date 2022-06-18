@@ -56,6 +56,7 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 				Arch: "x86_64",
 				Type: "hvm",
 			},
+			BootDevices: []libvirtxml.DomainBootDevice{},
 		},
 		Features: &libvirtxml.DomainFeatureList{
 			PAE:  &libvirtxml.DomainFeature{},
@@ -63,6 +64,13 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 			APIC: &libvirtxml.DomainFeatureAPIC{},
 		},
 	}
+
+	bootDevice1 := &libvirtxml.DomainBootDevice{}
+	bootDevice1.Dev = "hd"
+	domainDef.OS.BootDevices = append(domainDef.OS.BootDevices, *bootDevice1)
+	bootDevice2 := &libvirtxml.DomainBootDevice{}
+	bootDevice2.Dev = "network"
+	domainDef.OS.BootDevices = append(domainDef.OS.BootDevices, *bootDevice2)
 
 	for _, dg := range config.DomainGraphics {
 		domainDef.Devices.Graphics = append(domainDef.Devices.Graphics, *dg.DomainGraphic())
