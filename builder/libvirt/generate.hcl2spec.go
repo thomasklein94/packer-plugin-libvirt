@@ -33,6 +33,7 @@ type FlatConfig struct {
 	CommunicatorInterface *string                        `mapstructure:"communicator_interface" required:"false" cty:"communicator_interface" hcl:"communicator_interface"`
 	Volumes               []volume.FlatVolume            `mapstructure:"volume" required:"false" cty:"volume" hcl:"volume"`
 	ArtifactVolumeAlias   *string                        `mapstructure:"artifact_volume_alias" required:"false" cty:"artifact_volume_alias" hcl:"artifact_volume_alias"`
+	BootDevices           []string                       `mapstructure:"boot_devices" required:"false" cty:"boot_devices" hcl:"boot_devices"`
 	DomainGraphics        []FlatDomainGraphic            `mapstructure:"graphics" required:"false" cty:"graphics" hcl:"graphics"`
 	NetworkAddressSource  *string                        `mapstructure:"network_address_source" required:"false" cty:"network_address_source" hcl:"network_address_source"`
 	LibvirtURI            *string                        `mapstructure:"libvirt_uri" required:"true" cty:"libvirt_uri" hcl:"libvirt_uri"`
@@ -72,6 +73,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"communicator_interface":     &hcldec.AttrSpec{Name: "communicator_interface", Type: cty.String, Required: false},
 		"volume":                     &hcldec.BlockListSpec{TypeName: "volume", Nested: hcldec.ObjectSpec((*volume.FlatVolume)(nil).HCL2Spec())},
 		"artifact_volume_alias":      &hcldec.AttrSpec{Name: "artifact_volume_alias", Type: cty.String, Required: false},
+		"boot_devices":               &hcldec.AttrSpec{Name: "boot_devices", Type: cty.List(cty.String), Required: false},
 		"graphics":                   &hcldec.BlockListSpec{TypeName: "graphics", Nested: hcldec.ObjectSpec((*FlatDomainGraphic)(nil).HCL2Spec())},
 		"network_address_source":     &hcldec.AttrSpec{Name: "network_address_source", Type: cty.String, Required: false},
 		"libvirt_uri":                &hcldec.AttrSpec{Name: "libvirt_uri", Type: cty.String, Required: false},
