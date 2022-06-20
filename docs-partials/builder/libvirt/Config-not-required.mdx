@@ -22,6 +22,9 @@
 - `artifact_volume_alias` (string) - The alias of the drive designated to be the artifact. To learn more,
   see [Volumes](#volumes)
 
+- `boot_devices` ([]string) - Device(s) from which to boot, defaults to hard drive (first volume)
+  Available boot devices are: `hd`, `network`, `cdrom`
+
 - `graphics` ([]DomainGraphic) - See [Graphics and video, headless domains](#graphics-and-video-headless-domains).
 
 - `network_address_source` (string) - The alias of the network interface designated as the communicator interface.
