@@ -66,9 +66,8 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 	}
 
 	for _, bd := range config.BootDevices {
-		bootDevice := &libvirtxml.DomainBootDevice{}
-		bootDevice.Dev = bd
-		domainDef.OS.BootDevices = append(domainDef.OS.BootDevices, *bootDevice)
+		bootDevice := libvirtxml.DomainBootDevice{Dev: bd}
+		domainDef.OS.BootDevices = append(domainDef.OS.BootDevices, bootDevice)
 	}
 
 	for _, dg := range config.DomainGraphics {

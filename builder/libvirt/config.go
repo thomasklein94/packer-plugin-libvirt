@@ -123,7 +123,7 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	}
 
 	if len(c.BootDevices) == 0 {
-		c.BootDevices[0] = "hd"
+		c.BootDevices = []string{"hd"}
 	}
 
 	for i, volumeDef := range c.Volumes {
