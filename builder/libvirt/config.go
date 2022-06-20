@@ -124,6 +124,19 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 
 	if len(c.BootDevices) == 0 {
 		c.BootDevices = []string{"hd"}
+	} else {
+		for _, bd := range c.BootDevices {
+			switch bd {
+			case "hd":
+				continue
+			case "network":
+				continue
+			case "cdrom":
+				continue
+			default:
+				errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("unknown BootDevice: %s", bd))
+			}
+		}
 	}
 
 	for i, volumeDef := range c.Volumes {
