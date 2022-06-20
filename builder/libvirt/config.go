@@ -47,6 +47,10 @@ type Config struct {
 	// see [Volumes](#volumes)
 	ArtifactVolumeAlias string `mapstructure:"artifact_volume_alias" required:"false"`
 
+	// Device(s) from which to boot, defaults to hard drive (first volume)
+	// Available boot devices are: `hd`, `network`, `cdrom`
+	BootDevices []string `mapstructure:"boot_devices" required:"false"`
+
 	// See [Graphics and video, headless domains](#graphics-and-video-headless-domains).
 	DomainGraphics []DomainGraphic `mapstructure:"graphics" required:"false"`
 
@@ -116,6 +120,23 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 
 	if c.DomainName == "" {
 		c.DomainName = fmt.Sprintf("packer-%s", xid.New())
+	}
+
+	if len(c.BootDevices) == 0 {
+		c.BootDevices = []string{"hd"}
+	} else {
+		for _, bd := range c.BootDevices {
+			switch bd {
+			case "hd":
+				continue
+			case "network":
+				continue
+			case "cdrom":
+				continue
+			default:
+				errs = packersdk.MultiErrorAppend(errs, fmt.Errorf("unknown BootDevice: %s", bd))
+			}
+		}
 	}
 
 	for i, volumeDef := range c.Volumes {
