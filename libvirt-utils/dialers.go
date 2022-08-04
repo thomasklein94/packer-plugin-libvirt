@@ -2,7 +2,6 @@ package libvirtutils
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/socket"
@@ -13,7 +12,7 @@ func NewDialerFromLibvirtUri(uri LibvirtUri) (dialer socket.Dialer, err error) {
 	case "ssh":
 		dialer, err = NewSshDialer(uri)
 	case "tls":
-		dialer, err = newTlsDialer(uri)
+		dialer, err = NewTlsDialer(uri)
 	case "tcp":
 		dialer, err = NewTcpDialer(uri)
 	case "unix", "":
@@ -40,10 +39,7 @@ func ConnectByUri(uri LibvirtUri) (*libvirt.Libvirt, error) {
 
 	connection := libvirt.NewWithDialer(dialer)
 
-	name := uri.Name()
-	log.Printf("[DEBUG] Sending '%s' to libvirtd as URI\n", name)
-	err = connection.ConnectToURI(libvirt.ConnectURI(name))
-
+	err = connection.ConnectToURI(libvirt.ConnectURI(uri.Name()))
 	if err != nil {
 		if uri.Driver == "test" {
 			err = nil

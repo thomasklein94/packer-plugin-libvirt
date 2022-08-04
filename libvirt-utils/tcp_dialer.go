@@ -7,17 +7,14 @@ import (
 )
 
 func NewTcpDialer(uri LibvirtUri) (*dialers.Remote, error) {
-	opts := []dialers.RemoteOption{}
-
 	if uri.Hostname == "" {
 		return nil, fmt.Errorf("hostname must be specified for tcp transport")
 	}
 
-	port := uri.Port
-	if port == "" {
-		port = "16509"
+	var opts []dialers.RemoteOption
+	if uri.Port != "" {
+		opts = append(opts, dialers.UsePort(uri.Port))
 	}
-	address := fmt.Sprintf("%s:%s", uri.Hostname, uri.Port)
 
-	return dialers.NewRemote(address, opts...), nil
+	return dialers.NewRemote(uri.Hostname, opts...), nil
 }

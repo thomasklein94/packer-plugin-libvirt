@@ -11,8 +11,8 @@ import (
 )
 
 type TlsDialer struct {
-	address          string
-	tlsConfig        tls.Config
+	address   string
+	tlsConfig tls.Config
 }
 
 const (
@@ -25,10 +25,10 @@ func (dialer *TlsDialer) Dial() (net.Conn, error) {
 	return tls.Dial("tcp", dialer.address, &dialer.tlsConfig)
 }
 
-func newTlsDialer(uri LibvirtUri) (dialer *TlsDialer, err error) {
+func NewTlsDialer(uri LibvirtUri) (dialer *TlsDialer, err error) {
 	dialer = &TlsDialer{
-		address:          "",
-		tlsConfig:        tls.Config{},
+		address:   "",
+		tlsConfig: tls.Config{},
 	}
 	if err = tlsSetAddress(uri, dialer); err != nil {
 		return
