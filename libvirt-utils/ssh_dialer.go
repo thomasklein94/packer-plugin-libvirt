@@ -3,7 +3,6 @@ package libvirtutils
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"strconv"
 
@@ -25,7 +24,6 @@ func (dialer *SshDialer) Dial() (net.Conn, error) {
 		return nil, fmt.Errorf("error connecting to libvirt via ssh: %s", err)
 	}
 	dialer.sshClient = client
-	log.Println("Libvirt SSH transport connected")
 
 	return client.Dial("unix", dialer.remoteUnixSocket)
 }
