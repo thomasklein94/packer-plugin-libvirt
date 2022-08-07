@@ -8,7 +8,7 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 	domainDef := libvirtxml.Domain{
 		Name:        config.DomainName,
 		Description: "Domain created by packer-plugin-libvirt",
-		Type:        "kvm",
+		Type:        config.DomainType,
 		Memory: &libvirtxml.DomainMemory{
 			Value: uint(config.MemorySize),
 			Unit:  "MiB",
@@ -53,8 +53,9 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 		},
 		OS: &libvirtxml.DomainOS{
 			Type: &libvirtxml.DomainOSType{
-				Arch: "x86_64",
+				Arch: config.Arch,
 				Type: "hvm",
+				Machine: config.Chipset,
 			},
 			BootDevices: []libvirtxml.DomainBootDevice{},
 		},
@@ -86,6 +87,24 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 
 	for _, ni := range config.NetworkInterfaces {
 		domainDef.Devices.Interfaces = append(domainDef.Devices.Interfaces, *ni.DomainInterface())
+	}
+
+	if config.LoaderPath != "" {
+		domainDef.OS.Loader = &libvirtxml.DomainLoader{
+			Path:     config.LoaderPath,
+			Readonly: "yes",
+			Type:     config.LoaderType,
+		}
+		if config.SecureBoot {
+			domainDef.OS.Loader.Secure = "yes"
+		}
+	}
+
+	if config.NvramPath != "" || config.NvramTemplate != "" {
+		domainDef.OS.NVRam = &libvirtxml.DomainNVRam{
+			NVRam:    config.NvramTemplate,
+			Template: config.NvramPath,
+		}
 	}
 
 	return domainDef

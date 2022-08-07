@@ -39,6 +39,14 @@ type FlatConfig struct {
 	LibvirtURI            *string                        `mapstructure:"libvirt_uri" required:"true" cty:"libvirt_uri" hcl:"libvirt_uri"`
 	ShutdownMode          *string                        `mapstructure:"shutdown_mode" required:"false" cty:"shutdown_mode" hcl:"shutdown_mode"`
 	ShutdownTimeout       *string                        `mapstructure:"shutdown_timeout" required:"false" cty:"shutdown_timeout" hcl:"shutdown_timeout"`
+	DomainType            *string                        `mapstructure:"domain_type" required:"false" cty:"domain_type" hcl:"domain_type"`
+	Arch                  *string                        `mapstructure:"arch" required:"false" cty:"arch" hcl:"arch"`
+	Chipset               *string                        `mapstructure:"chipset" required:"false" cty:"chipset" hcl:"chipset"`
+	LoaderPath            *string                        `mapstructure:"loader_path" required:"false" cty:"loader_path" hcl:"loader_path"`
+	LoaderType            *string                        `mapstructure:"loader_type" required:"false" cty:"loader_type" hcl:"loader_type"`
+	SecureBoot            *bool                          `mapstructure:"secure_boot" required:"false" cty:"secure_boot" hcl:"secure_boot"`
+	NvramPath             *string                        `mapstructure:"nvram_path" required:"false" cty:"nvram_path" hcl:"nvram_path"`
+	NvramTemplate         *string                        `mapstructure:"nvram_template" required:"false" cty:"nvram_template" hcl:"nvram_template"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -79,6 +87,14 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"libvirt_uri":                &hcldec.AttrSpec{Name: "libvirt_uri", Type: cty.String, Required: false},
 		"shutdown_mode":              &hcldec.AttrSpec{Name: "shutdown_mode", Type: cty.String, Required: false},
 		"shutdown_timeout":           &hcldec.AttrSpec{Name: "shutdown_timeout", Type: cty.String, Required: false},
+		"domain_type":                &hcldec.AttrSpec{Name: "domain_type", Type: cty.String, Required: false},
+		"arch":                       &hcldec.AttrSpec{Name: "arch", Type: cty.String, Required: false},
+		"chipset":                    &hcldec.AttrSpec{Name: "chipset", Type: cty.String, Required: false},
+		"loader_path":                &hcldec.AttrSpec{Name: "loader_path", Type: cty.String, Required: false},
+		"loader_type":                &hcldec.AttrSpec{Name: "loader_type", Type: cty.String, Required: false},
+		"secure_boot":                &hcldec.AttrSpec{Name: "secure_boot", Type: cty.Bool, Required: false},
+		"nvram_path":                 &hcldec.AttrSpec{Name: "nvram_path", Type: cty.String, Required: false},
+		"nvram_template":             &hcldec.AttrSpec{Name: "nvram_template", Type: cty.String, Required: false},
 	}
 	return s
 }
