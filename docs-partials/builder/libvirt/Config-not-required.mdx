@@ -39,4 +39,33 @@
 - `shutdown_timeout` (duration string | ex: "1h5m2s") - After succesfull provisioning, Packer will wait this long for the virtual machine to gracefully
   stop before it destroys it. If not specified, Packer will wait for 5 minutes.
 
+- `domain_type` (string) - [Expert] Domain type. It specifies the hypervisor used for running the domain.
+  The allowed values are driver specific, but include "xen", "kvm", "hvf", "qemu" and "lxc".
+  Default is kvm.
+  If unsure, leave it empty.
+
+- `arch` (string) - [Expert] Domain architecture. Default is x86_64
+
+- `chipset` (string) - Libvirt Machine Type
+  Value for domain XML's machine type. If unsure, leave it empty
+
+- `loader_path` (string) - [Expert] Refers to a firmware blob, which is specified by absolute path, used to assist the domain creation process.
+  If unsure, leave it empty.
+
+- `loader_type` (string) - [Expert] Accepts values rom and pflash. It tells the hypervisor where in the guest memory the loader(rom) should be mapped.
+  If unsure, leave it empty.
+
+- `secure_boot` (bool) - [Expert] Some firmwares may implement the Secure boot feature.
+  This attribute can be used to tell the hypervisor that the firmware is capable of Secure Boot feature.
+  It cannot be used to enable or disable the feature itself in the firmware.
+  If unsure, leave it empty.
+
+- `nvram_path` (string) - [Expert] Some UEFI firmwares may want to use a non-volatile memory to store some variables.
+  In the host, this is represented as a file and the absolute path to the file is stored in this element.
+  If unsure, leave it empty.`
+
+- `nvram_template` (string) - [Expert] If the domain is an UEFI domain, libvirt copies a so called master NVRAM store file defined in qemu.conf.
+  If needed, the template attribute can be used to per domain override map of master NVRAM stores from the config file.
+  If unsure, leave it empty.
+
 <!-- End of code generated from the comments of the Config struct in builder/libvirt/config.go; -->

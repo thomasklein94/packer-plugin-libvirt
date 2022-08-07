@@ -69,6 +69,36 @@ type Config struct {
 	// stop before it destroys it. If not specified, Packer will wait for 5 minutes.
 	ShutdownTimeout time.Duration `mapstructure:"shutdown_timeout" required:"false"`
 
+	// [Expert] Domain type. It specifies the hypervisor used for running the domain.
+	// The allowed values are driver specific, but include "xen", "kvm", "hvf", "qemu" and "lxc".
+	// Default is kvm.
+	// If unsure, leave it empty.
+	DomainType string `mapstructure:"domain_type" required:"false"`
+	// [Expert] Domain architecture. Default is x86_64
+	Arch string `mapstructure:"arch" required:"false"`
+	// Libvirt Machine Type
+	// Value for domain XML's machine type. If unsure, leave it empty
+	Chipset string `mapstructure:"chipset" required:"false"`
+	// [Expert] Refers to a firmware blob, which is specified by absolute path, used to assist the domain creation process.
+	// If unsure, leave it empty.
+	LoaderPath string `mapstructure:"loader_path" required:"false"`
+	// [Expert] Accepts values rom and pflash. It tells the hypervisor where in the guest memory the loader(rom) should be mapped.
+	// If unsure, leave it empty.
+	LoaderType string `mapstructure:"loader_type" required:"false"`
+	// [Expert] Some firmwares may implement the Secure boot feature.
+	// This attribute can be used to tell the hypervisor that the firmware is capable of Secure Boot feature.
+	// It cannot be used to enable or disable the feature itself in the firmware.
+	// If unsure, leave it empty.
+	SecureBoot bool `mapstructure:"secure_boot" required:"false"`
+	// [Expert] Some UEFI firmwares may want to use a non-volatile memory to store some variables.
+	// In the host, this is represented as a file and the absolute path to the file is stored in this element.
+	// If unsure, leave it empty.`
+	NvramPath string `mapstructure:"nvram_path" required:"false"`
+	// [Expert] If the domain is an UEFI domain, libvirt copies a so called master NVRAM store file defined in qemu.conf.
+	// If needed, the template attribute can be used to per domain override map of master NVRAM stores from the config file.
+	// If unsure, leave it empty.
+	NvramTemplate string `mapstructure:"nvram_template" required:"false"`
+
 	ctx interpolate.Context
 }
 
@@ -185,6 +215,14 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 
 	if len(errs.Errors) > 0 {
 		return warnings, errs
+	}
+
+	if c.DomainType == "" {
+		c.DomainType = "kvm"
+	}
+
+	if c.Arch == "" {
+		c.Arch = "x86_64"
 	}
 
 	return warnings, nil
