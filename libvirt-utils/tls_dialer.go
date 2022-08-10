@@ -22,7 +22,15 @@ const (
 )
 
 func (dialer *TlsDialer) Dial() (net.Conn, error) {
-	return tls.Dial("tcp", dialer.address, &dialer.tlsConfig)
+	conn, err := tls.Dial("tcp", dialer.address, &dialer.tlsConfig)
+	// Workaround for hanging TLS connection described here: https://github.com/digitalocean/go-libvirt/issues/89
+	if err == nil {
+		_, err = conn.Read(make([]byte, 1))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return conn, err
 }
 
 func NewTlsDialer(uri LibvirtUri) (dialer *TlsDialer, err error) {
