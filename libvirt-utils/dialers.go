@@ -17,6 +17,8 @@ func NewDialerFromLibvirtUri(uri LibvirtUri) (dialer socket.Dialer, err error) {
 		dialer, err = NewTcpDialer(uri)
 	case "unix", "":
 		dialer = NewUnixDialer(uri)
+	default:
+		err = fmt.Errorf("%s is not supported uri transport", uri.Transport)
 	}
 
 	return
