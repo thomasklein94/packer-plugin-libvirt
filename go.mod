@@ -1,6 +1,6 @@
 module github.com/thomasklein94/packer-plugin-libvirt
 
-go 1.17
+go 1.18
 
 require (
 	github.com/digitalocean/go-libvirt v0.0.0-20220407213524-fde04463c367
