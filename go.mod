@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/digitalocean/go-libvirt v0.0.0-20220407213524-fde04463c367
-	github.com/hashicorp/hcl/v2 v2.14.0
+	github.com/hashicorp/hcl/v2 v2.14.1
 	github.com/hashicorp/packer-plugin-sdk v0.3.2
 	github.com/libvirt/libvirt-go-xml v7.4.0+incompatible
 	github.com/rs/xid v1.4.0
