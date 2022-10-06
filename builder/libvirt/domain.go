@@ -105,8 +105,8 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 
 	if config.NvramPath != "" || config.NvramTemplate != "" {
 		domainDef.OS.NVRam = &libvirtxml.DomainNVRam{
-			NVRam:    config.NvramTemplate,
-			Template: config.NvramPath,
+			NVRam:    config.NvramPath,
+			Template: config.NvramTemplate,
 		}
 	}
 
