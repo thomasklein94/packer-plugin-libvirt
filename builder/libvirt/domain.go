@@ -97,6 +97,9 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 		}
 		if config.SecureBoot {
 			domainDef.OS.Loader.Secure = "yes"
+			domainDef.Features.SMM = &libvirtxml.DomainFeatureSMM{
+				State: "yes",
+			}
 		}
 	}
 
