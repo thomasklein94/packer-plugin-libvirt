@@ -53,8 +53,8 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 		},
 		OS: &libvirtxml.DomainOS{
 			Type: &libvirtxml.DomainOSType{
-				Arch: config.Arch,
-				Type: "hvm",
+				Arch:    config.Arch,
+				Type:    "hvm",
 				Machine: config.Chipset,
 			},
 			BootDevices: []libvirtxml.DomainBootDevice{},
@@ -98,7 +98,7 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 		if config.SecureBoot {
 			domainDef.OS.Loader.Secure = "yes"
 			domainDef.Features.SMM = &libvirtxml.DomainFeatureSMM{
-				State: "yes",
+				State: "on",
 			}
 		}
 	}
