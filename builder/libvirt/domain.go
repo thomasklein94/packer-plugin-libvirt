@@ -9,6 +9,9 @@ func newDomainDefinition(config *Config) libvirtxml.Domain {
 		Name:        config.DomainName,
 		Description: "Domain created by packer-plugin-libvirt",
 		Type:        config.DomainType,
+		CPU: &libvirtxml.DomainCPU{
+			Mode: config.CpuMode,
+		},
 		Memory: &libvirtxml.DomainMemory{
 			Value: uint(config.MemorySize),
 			Unit:  "MiB",

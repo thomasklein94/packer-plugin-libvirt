@@ -12,6 +12,10 @@
 - `vcpu` (int) - The number of cpus to use when building the VM.
   The default is `1` CPU.
 
+- `cpu_mode` (string) - Set CPU mode, you might want to set it to "host-passthrough".
+  See [libvirt documentation](https://libvirt.org/formatdomain.html#cpu-model-and-topology) for more information.
+  If not specified, let libvirt decide.
+
 - `network_interface` ([]network.NetworkInterface) - Network interface attachments. See [Network](#network) for more.
 
 - `communicator_interface` (string) - The alias of the network interface used for the SSH/WinRM connections
