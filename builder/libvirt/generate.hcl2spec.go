@@ -29,6 +29,7 @@ type FlatConfig struct {
 	DomainName            *string                        `mapstructure:"domain_name" required:"false" cty:"domain_name" hcl:"domain_name"`
 	MemorySize            *int                           `mapstructure:"memory" required:"false" cty:"memory" hcl:"memory"`
 	CpuCount              *int                           `mapstructure:"vcpu" required:"false" cty:"vcpu" hcl:"vcpu"`
+	CpuMode               *string                        `mapstructure:"cpu_mode" required:"false" cty:"cpu_mode" hcl:"cpu_mode"`
 	NetworkInterfaces     []network.FlatNetworkInterface `mapstructure:"network_interface" required:"false" cty:"network_interface" hcl:"network_interface"`
 	CommunicatorInterface *string                        `mapstructure:"communicator_interface" required:"false" cty:"communicator_interface" hcl:"communicator_interface"`
 	Volumes               []volume.FlatVolume            `mapstructure:"volume" required:"false" cty:"volume" hcl:"volume"`
@@ -77,6 +78,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"domain_name":                &hcldec.AttrSpec{Name: "domain_name", Type: cty.String, Required: false},
 		"memory":                     &hcldec.AttrSpec{Name: "memory", Type: cty.Number, Required: false},
 		"vcpu":                       &hcldec.AttrSpec{Name: "vcpu", Type: cty.Number, Required: false},
+		"cpu_mode":                   &hcldec.AttrSpec{Name: "cpu_mode", Type: cty.String, Required: false},
 		"network_interface":          &hcldec.BlockListSpec{TypeName: "network_interface", Nested: hcldec.ObjectSpec((*network.FlatNetworkInterface)(nil).HCL2Spec())},
 		"communicator_interface":     &hcldec.AttrSpec{Name: "communicator_interface", Type: cty.String, Required: false},
 		"volume":                     &hcldec.BlockListSpec{TypeName: "volume", Nested: hcldec.ObjectSpec((*volume.FlatVolume)(nil).HCL2Spec())},

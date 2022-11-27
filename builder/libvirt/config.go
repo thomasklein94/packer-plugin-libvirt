@@ -35,6 +35,11 @@ type Config struct {
 	// The default is `1` CPU.
 	CpuCount int `mapstructure:"vcpu" required:"false"`
 
+	// Set CPU mode, you might want to set it to "host-passthrough".
+	// See [libvirt documentation](https://libvirt.org/formatdomain.html#cpu-model-and-topology) for more information.
+	// If not specified, let libvirt decide.
+	CpuMode string `mapstructure:"cpu_mode" required:"false"`
+
 	// Network interface attachments. See [Network](#network) for more.
 	NetworkInterfaces []network.NetworkInterface `mapstructure:"network_interface" required:"false"`
 	// The alias of the network interface used for the SSH/WinRM connections
