@@ -7,7 +7,7 @@ import (
 	libvirt "github.com/digitalocean/go-libvirt"
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
-	libvirtxml "github.com/libvirt/libvirt-go-xml"
+	"libvirt.org/go/libvirtxml"
 )
 
 type stepDefineDomain struct{}

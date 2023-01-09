@@ -8,8 +8,8 @@ import (
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
-	libvirtxml "github.com/libvirt/libvirt-go-xml"
 	"github.com/rs/xid"
+	"libvirt.org/go/libvirtxml"
 )
 
 type Volume struct {

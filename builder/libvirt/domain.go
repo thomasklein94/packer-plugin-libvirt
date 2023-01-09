@@ -1,7 +1,7 @@
 package libvirt
 
 import (
-	libvirtxml "github.com/libvirt/libvirt-go-xml"
+	"libvirt.org/go/libvirtxml"
 )
 
 func newDomainDefinition(config *Config) libvirtxml.Domain {

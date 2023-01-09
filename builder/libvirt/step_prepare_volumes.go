@@ -8,8 +8,8 @@ import (
 	libvirt "github.com/digitalocean/go-libvirt"
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
-	libvirtxml "github.com/libvirt/libvirt-go-xml"
 	"github.com/thomasklein94/packer-plugin-libvirt/builder/libvirt/volume"
+	"libvirt.org/go/libvirtxml"
 )
 
 type stepPrepareVolumes struct {

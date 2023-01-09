@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
-	libvirtxml "github.com/libvirt/libvirt-go-xml"
+	"libvirt.org/go/libvirtxml"
 )
 
 type NetworkInterface struct {
