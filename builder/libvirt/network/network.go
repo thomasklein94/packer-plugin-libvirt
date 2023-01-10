@@ -1,4 +1,4 @@
-//go:generate packer-sdc struct-markdown
+//go:generate go run github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc struct-markdown
 
 package network
 
