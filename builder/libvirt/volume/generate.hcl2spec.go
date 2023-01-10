@@ -124,6 +124,7 @@ type FlatVolume struct {
 	Bus       *string           `mapstructure:"bus" required:"false" cty:"bus" hcl:"bus"`
 	Alias     *string           `mapstructure:"alias" required:"false" cty:"alias" hcl:"alias"`
 	Format    *string           `mapstructure:"format" required:"false" cty:"format" hcl:"format"`
+	Device    *string           `mapstructure:"device" required:"false" cty:"device" hcl:"device"`
 }
 
 // FlatMapstructure returns a new FlatVolume.
@@ -148,6 +149,7 @@ func (*FlatVolume) HCL2Spec() map[string]hcldec.Spec {
 		"bus":        &hcldec.AttrSpec{Name: "bus", Type: cty.String, Required: false},
 		"alias":      &hcldec.AttrSpec{Name: "alias", Type: cty.String, Required: false},
 		"format":     &hcldec.AttrSpec{Name: "format", Type: cty.String, Required: false},
+		"device":     &hcldec.AttrSpec{Name: "device", Type: cty.String, Required: false},
 	}
 	return s
 }
