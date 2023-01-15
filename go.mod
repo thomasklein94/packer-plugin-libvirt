@@ -7,7 +7,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.14.1
 	github.com/hashicorp/packer-plugin-sdk v0.3.2
 	github.com/rs/xid v1.4.0
-	github.com/zclconf/go-cty v1.10.0
+	github.com/zclconf/go-cty v1.12.1
 	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167
 	golang.org/x/mobile v0.0.0-20210901025245-1fde1d6c3ca1
 	libvirt.org/go/libvirtxml v1.8009.0
