@@ -1,4 +1,4 @@
-//go:generate packer-sdc struct-markdown
+//go:generate go run github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc struct-markdown
 
 package libvirt
 
@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
-	libvirtxml "github.com/libvirt/libvirt-go-xml"
+	"libvirt.org/go/libvirtxml"
 )
 
 type DomainGraphic struct {

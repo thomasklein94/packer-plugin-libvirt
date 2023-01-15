@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 
 	libvirt "github.com/digitalocean/go-libvirt"
-	libvirtxml "github.com/libvirt/libvirt-go-xml"
+	"libvirt.org/go/libvirtxml"
 )
 
 type communicatorAddressHelper struct {
