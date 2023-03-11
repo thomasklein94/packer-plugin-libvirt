@@ -59,10 +59,12 @@ func GetDomainCommunicatorAddress(state multistep.StateBag) (string, error) {
 				addresses = append(addresses, addr)
 			}
 
-			randomIndex := rand.Intn(len(addresses))
-			pick := addresses[randomIndex]
+			if len(addresses) > 0 {
+				randomIndex := rand.Intn(len(addresses))
+				pick := addresses[randomIndex]
 
-			return pick, nil
+				return pick, nil
+			}
 		}
 	}
 
