@@ -22,6 +22,21 @@ Before looking at the configuration options and examples, you might also want to
 familiarize yourself with [libvirt's domain specification](https://libvirt.org/formatdomain.html)
 and [libvirt's storage pool and volume concepts](https://libvirt.org/formatstorage.html).
 
+### Installation
+
+To use the pre-built release of Packer Plugin Libvirt, you can add the following snippet to your Packer project:
+
+```hcl
+packer {
+  required_plugins {
+    libvirt = {
+      version = ">= 0.4.3"
+      source  = "github.com/thomasklein94/libvirt"
+    }
+  }
+}
+```
+
 <!-- Builder Configuration Fields -->
 
 ### Required
