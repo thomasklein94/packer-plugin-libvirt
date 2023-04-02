@@ -157,6 +157,14 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		c.DomainName = fmt.Sprintf("packer-%s", xid.New())
 	}
 
+	if c.CpuCount <= 0 {
+		c.CpuCount = 1
+	}
+
+	if c.MemorySize <= 0 {
+		c.MemorySize = 512
+	}
+
 	if len(c.BootDevices) == 0 {
 		c.BootDevices = []string{"hd"}
 	} else {
