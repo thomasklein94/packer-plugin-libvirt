@@ -275,3 +275,19 @@ func fmtReadPostfixedValue(s string) (value uint64, unit string, err error) {
 	}
 	return
 }
+
+func unitToMultiplier(unit string) (value int64, err error) {
+	switch unit {
+	case "B":
+		value = 1
+	case "KiB":
+		value = 1024
+	case "Mib":
+		value = 1024 * 1024
+	case "Gib":
+		value = 1024 * 1024 * 1024
+	default:
+		err = fmt.Errorf("unknown unit %s", unit)
+	}
+	return
+}

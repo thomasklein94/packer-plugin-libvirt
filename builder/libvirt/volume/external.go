@@ -70,6 +70,8 @@ func (vs *ExternalVolumeSource) PrepareVolume(pctx *PreparationContext) multiste
 		return pctx.HaltOnError(err, "preparing volume: %s", err)
 	}
 
+	storageTargetCapacity := pctx.VolumeDefinition.Capacity
+
 	pctx.VolumeDefinition.Allocation = &libvirtxml.StorageVolumeSize{
 		Value: uint64(stat.Size()),
 		Unit:  "B",
@@ -108,6 +110,26 @@ func (vs *ExternalVolumeSource) PrepareVolume(pctx *PreparationContext) multiste
 
 	if err != nil {
 		log.Printf("Error while refreshing volume definition: %s\n", err)
+	}
+
+	if storageTargetCapacity != nil {
+		pctx.Ui.Message(fmt.Sprintf(
+			"Resizing volume %s/%s to meet capacity %d%s",
+			pctx.VolumeConfig.Pool,
+			pctx.VolumeConfig.Name,
+			storageTargetCapacity.Value,
+			storageTargetCapacity.Unit,
+		))
+		multiplier, err := unitToMultiplier(storageTargetCapacity.Unit)
+		if err != nil {
+			return pctx.HaltOnError(err, "Error during volume resize: %s", err)
+		}
+		targetCapacityInBytes := storageTargetCapacity.Value * uint64(multiplier)
+
+		err = pctx.Driver.StorageVolResize(*pctx.VolumeRef, targetCapacityInBytes, 0)
+		if err != nil {
+			return pctx.HaltOnError(err, "Error during volume resize: %s", err)
+		}
 	}
 
 	return multistep.ActionContinue
