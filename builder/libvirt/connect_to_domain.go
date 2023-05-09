@@ -25,6 +25,12 @@ func GetDomainCommunicatorAddress(state multistep.StateBag) (string, error) {
 	helper := state.Get("communicator_address_helper").(*communicatorAddressHelper)
 	domainRef := state.Get("domain").(*libvirt.Domain)
 
+	host := config.Communicator.Host()
+	if host != "" {
+		log.Printf("Using user specified host '%s' for communication\n", host)
+		return host, nil
+	}
+
 	interfaces, err := driver.DomainInterfaceAddresses(*domainRef, helper.Source, 0)
 	if err != nil {
 		return "", err

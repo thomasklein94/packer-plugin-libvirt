@@ -273,6 +273,12 @@ func (c *Config) prepareArtifactVolume(errs *packersdk.MultiError, warnings []st
 }
 
 func (c *Config) prepareCommunicator(warnings []string, errs *packersdk.MultiError) ([]string, *packersdk.MultiError) {
+	userDefinedHost := c.Communicator.Host()
+
+	if userDefinedHost != "" {
+		warnings = append(warnings, "Overriding communicator address to '%s'", userDefinedHost)
+	}
+
 	original := c.CommunicatorInterface
 	if c.CommunicatorInterface == "" {
 		c.CommunicatorInterface = "communicator"
