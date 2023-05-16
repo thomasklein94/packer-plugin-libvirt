@@ -52,7 +52,7 @@ func (uri *LibvirtUri) GetExtra(p LibvirtUriExtraParam) (string, bool) {
 }
 
 func (uri *LibvirtUri) Unmarshal(s string) error {
-	uriRegex := `^(?P<Driver>[a-z]+)(\+(?P<Transport>[a-z]+))?://(((?P<Username>[a-z]+)@)?(?P<Hostname>[-_.a-z0-9]+)(:(?P<Port>[0-9]+)?)?)?(?P<Path>/[-_.a-z0-9]+)?(\?(?P<extra>.*))?$`
+	uriRegex := `^(?P<Driver>[a-z]+)(\+(?P<Transport>[a-z]+))?://(((?P<Username>[a-z_][-a-z0-9_]*\$?)@)?(?P<Hostname>[-_.a-z0-9]+)(:(?P<Port>[0-9]+)?)?)?(?P<Path>/[-_.a-z0-9]+)?(\?(?P<extra>.*))?$`
 	re := regexp.MustCompile(uriRegex)
 
 	matches := allMatchedRegexpGroups(re, s)

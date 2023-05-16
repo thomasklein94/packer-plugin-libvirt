@@ -53,6 +53,29 @@ func TestValidUriUnmarshall(t *testing.T) {
 				"keyfile":   "/path/to/key",
 			},
 		},
+
+		"qemu+ssh://s0m3us3r@some.host:8022/system?keyfile=/path/to/key&no_verify=1": {
+			Driver:    "qemu",
+			Transport: "ssh",
+			Username:  "s0m3us3r",
+			Hostname:  "some.host",
+			Port:      "8022",
+			Path:      "/system",
+			ExtraParams: map[string]string{
+				"no_verify": "1",
+				"keyfile":   "/path/to/key",
+			},
+		},
+
+		"qemu+ssh://s0m3us3r$@so.me.ho.st:8022/system": {
+			Driver:      "qemu",
+			Transport:   "ssh",
+			Username:    "s0m3us3r$",
+			Hostname:    "so.me.ho.st",
+			Port:        "8022",
+			Path:        "/system",
+			ExtraParams: map[string]string{},
+		},
 	}
 
 	for raw, expected := range expectations {
