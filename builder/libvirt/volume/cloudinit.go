@@ -4,8 +4,6 @@ package volume
 
 import (
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"github.com/hashicorp/packer-plugin-sdk/multistep/commonsteps"
@@ -89,7 +87,6 @@ func (vs *CloudInitSource) PrepareVolume(pctx *PreparationContext) multistep.Ste
 		createStep.Content["network-config"] = *vs.NetworkConfig
 	}
 
-	// tempState := new(multistep.StateBag)
 	tempState := &multistep.BasicStateBag{}
 	tempState.Put("ui", pctx.Ui)
 
@@ -104,53 +101,7 @@ func (vs *CloudInitSource) PrepareVolume(pctx *PreparationContext) multistep.Ste
 	}
 	cdPath := tempState.Get("cd_path").(string)
 
-	fPtr, err := os.Open(cdPath)
-	if err != nil {
-		pctx.HaltOnError(err, "CloudInit.Open: %s", err)
-	}
+	defer createStep.Cleanup(tempState)
 
-	fInfo, err := fPtr.Stat()
-	if err != nil {
-		pctx.HaltOnError(err, "CloudInit.Stat: %s", err)
-	}
-
-	size := uint64(fInfo.Size())
-	pctx.VolumeDefinition.Capacity = &libvirtxml.StorageVolumeSize{
-		Value: size,
-		Unit:  "B",
-	}
-	// If omitted when creating a volume, the volume will be fully allocated at time of creation.
-	pctx.VolumeDefinition.Allocation = nil
-
-	err = pctx.CreateVolume()
-	if err != nil {
-		return pctx.HaltOnError(err, "%s", err)
-	}
-
-	err = pctx.Driver.StorageVolUpload(*pctx.VolumeRef, fPtr, 0, size, 0)
-
-	if err != nil {
-		connectUri, _ := pctx.Driver.ConnectGetUri()
-
-		// The test backend does not support Volume Uploads, so
-		if connectUri[0:4] == "test" {
-			pctx.Ui.Error(fmt.Sprintf("CloudInit.Upload: %s", err))
-		} else {
-			return pctx.HaltOnError(err, "CloudInit.Upload: %s", err)
-		}
-	}
-
-	err = pctx.RefreshVolumeDefinition()
-
-	if err != nil {
-		log.Printf("Error while refreshing volume definition: %s\n", err)
-	}
-
-	if err := fPtr.Close(); err != nil {
-		log.Println("Error closing CD stream")
-	}
-
-	createStep.Cleanup(tempState)
-
-	return multistep.ActionContinue
+	return pctx.uploadVolume(cdPath)
 }

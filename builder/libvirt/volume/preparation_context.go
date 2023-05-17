@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/digitalocean/go-libvirt"
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
@@ -89,6 +90,55 @@ func (pctx *PreparationContext) RefreshVolumeDefinition() error {
 
 	pctx.VolumeDefinition = volumeDef
 	return nil
+}
+
+func (pctx *PreparationContext) uploadVolume(path string) multistep.StepAction {
+
+	fPtr, err := os.Open(path)
+	if err != nil {
+		pctx.HaltOnError(err, "UploadVolume.Open: %s", err)
+	}
+
+	defer fPtr.Close()
+
+	fInfo, err := fPtr.Stat()
+	if err != nil {
+		pctx.HaltOnError(err, "UploadVolume.Stat: %s", err)
+	}
+
+	size := uint64(fInfo.Size())
+	pctx.VolumeDefinition.Capacity = &libvirtxml.StorageVolumeSize{
+		Value: size,
+		Unit:  "B",
+	}
+	// If omitted when creating a volume, the volume will be fully allocated at time of creation.
+	pctx.VolumeDefinition.Allocation = nil
+
+	err = pctx.CreateVolume()
+	if err != nil {
+		return pctx.HaltOnError(err, "%s", err)
+	}
+
+	err = pctx.Driver.StorageVolUpload(*pctx.VolumeRef, fPtr, 0, size, 0)
+
+	if err != nil {
+		connectUri, _ := pctx.Driver.ConnectGetUri()
+
+		// The test backend does not support Volume Uploads, so
+		if connectUri[0:4] == "test" {
+			pctx.Ui.Error(fmt.Sprintf("UploadVolume.Upload: %s", err))
+		} else {
+			return pctx.HaltOnError(err, "UploadVolume.Upload: %s", err)
+		}
+	}
+
+	err = pctx.RefreshVolumeDefinition()
+
+	if err != nil {
+		log.Printf("Error while refreshing volume definition: %s\n", err)
+	}
+
+	return multistep.ActionContinue
 }
 
 func (pctx *PreparationContext) HaltOnError(err error, s string, a ...interface{}) multistep.StepAction {
