@@ -27,7 +27,7 @@ func (vs *VolumeSource) PrepareConfig(ctx *interpolate.Context, vol *Volume, dom
 	case "backing-store", "backingstore":
 		return vs.BackingStore.PrepareConfig(ctx, vol)
 	case "cloning", "clone":
-		vs.CloningVolume.PrepareConfig(ctx, vol)
+		return vs.CloningVolume.PrepareConfig(ctx, vol)
 	default:
 		errs = append(errs, fmt.Errorf("unsupported volume source type '%s'", vs.Type))
 	}
@@ -69,7 +69,7 @@ func (vs *VolumeSource) PrepareVolume(pctx *PreparationContext) multistep.StepAc
 	case "backing-store", "backingstore":
 		return vs.BackingStore.PrepareVolume(pctx)
 	case "cloning", "clone":
-		vs.CloningVolume.PrepareVolume(pctx)
+		return vs.CloningVolume.PrepareVolume(pctx)
 	}
 	return multistep.ActionContinue
 }
