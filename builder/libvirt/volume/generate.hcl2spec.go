@@ -10,7 +10,7 @@ import (
 // FlatBackingStoreVolumeSource is an auto-generated flat version of BackingStoreVolumeSource.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatBackingStoreVolumeSource struct {
-	Pool   *string `mapstucture:"pool" required:"false" cty:"pool" hcl:"pool"`
+	Pool   *string `mapstructure:"pool" required:"false" cty:"pool" hcl:"pool"`
 	Volume *string `mapstructure:"volume" required:"false" cty:"volume" hcl:"volume"`
 	Path   *string `mapstructure:"path" required:"false" cty:"path" hcl:"path"`
 }

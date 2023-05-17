@@ -13,7 +13,7 @@ import (
 
 type BackingStoreVolumeSource struct {
 	// Specifies the name of the storage pool (managed by libvirt) where the disk source resides
-	Pool string `mapstucture:"pool" required:"false"`
+	Pool string `mapstructure:"pool" required:"false"`
 	// Specifies the name of storage volume (managed by libvirt) used as the disk source.
 	Volume string `mapstructure:"volume" required:"false"`
 	// The file backing the volume. Mutually exclusive with pool and volume args!
