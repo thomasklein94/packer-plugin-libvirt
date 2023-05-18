@@ -182,6 +182,8 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		}
 	}
 
+	volume.ResetDeviceLetters()
+
 	for i, volumeDef := range c.Volumes {
 		w, e := volumeDef.PrepareConfig(&c.ctx, c.DomainName)
 		warnings = append(warnings, w...)

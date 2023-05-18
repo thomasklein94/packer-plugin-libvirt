@@ -12,6 +12,59 @@ import (
 	"libvirt.org/go/libvirtxml"
 )
 
+var nextSerialLetter func() (string, error)
+var nextIdeLetter func() (string, error)
+var nextFloppyLetter func() (string, error)
+var nextVirtioLetter func() (string, error)
+
+func letterGenerator(prefix string, options string) func() (string, error) {
+	if len(options) == 0 {
+		panic("letterGenerator needs at least 1 option to work with")
+	}
+
+	var next = 0
+	return func() (string, error) {
+		if next >= len(options) {
+			return "", fmt.Errorf("device bus has used up all possible letters")
+		}
+		nextLetter := options[next]
+		next = next + 1
+
+		return prefix + string(nextLetter), nil
+	}
+}
+
+const asciiLower = "abcdefghijklmnopqrstuvwxyz"
+
+const scsiSataPrefix = "sd"
+const idePrefix = "hd"
+const floppyPrefix = "fd"
+const virtualPrefix = "vd"
+
+func ResetDeviceLetters() {
+	nextSerialLetter = letterGenerator(scsiSataPrefix, asciiLower)
+	nextIdeLetter = letterGenerator(idePrefix, asciiLower)
+	nextFloppyLetter = letterGenerator(floppyPrefix, "abcd")
+	nextVirtioLetter = letterGenerator(virtualPrefix, asciiLower)
+}
+
+func init() {
+	ResetDeviceLetters()
+}
+
+func nextDriveLetter(bus string) (string, error) {
+	switch bus {
+	case "fdc":
+		return nextFloppyLetter()
+	case "ide":
+		return nextIdeLetter()
+	case "virtio":
+		return nextVirtioLetter()
+	default:
+		return nextSerialLetter()
+	}
+}
+
 type Volume struct {
 	// Specifies the name of the storage pool (managed by libvirt) where the disk resides. If not specified
 	// the pool named `default` will be used
@@ -43,11 +96,8 @@ type Volume struct {
 	Capacity string `mapstructure:"capacity" required:"false"`
 	// If true, it indicates the device cannot be modified by the guest.
 	ReadOnly bool `mapstructure:"readonly" required:"false"`
-	// The target element controls the bus / device under which the disk is exposed
-	// to the guest OS. The dev attribute indicates the "logical" device name.
-	// The actual device name specified is not guaranteed to map to the device name
-	// in the guest OS. Treat it as a device ordering hint.
-	// If no `bus` and `target_dev` attribute is specified, it defaults to `target_dev = "sda"` with `bus = "scsi"`
+	// DEPRECATED!
+	// The device order on the bus is determined automatically from the order of definition
 	TargetDev string `mapstructure:"target_dev" required:"false"`
 	// The optional bus attribute specifies the type of disk device to emulate;
 	// possible values are driver specific, with typical values being
@@ -83,13 +133,30 @@ func (v *Volume) PrepareConfig(ctx *interpolate.Context, domainName string) (war
 
 	if v.Pool == "" {
 		v.Pool = "default"
-		warnings = append(warnings, fmt.Sprintf("Pool isn't set for volume %s, using the '%s' pool", v.Name, v.Pool))
+		warnings = append(warnings, fmt.Sprintf("Pool isn't set for volume, using the '%s' pool", v.Pool))
 	}
 
-	if v.Bus == "" && v.TargetDev == "" {
-		v.Bus = "scsi"
-		v.TargetDev = "sda"
-		warnings = append(warnings, fmt.Sprintf("Bus and target_dev aren't set for volume %s/%s, using bus=%s and target_dev=%s as default", v.Pool, v.Name, v.Bus, v.TargetDev))
+	if v.Bus == "" {
+		if v.Device == "floppy" {
+			v.Bus = "fdc"
+		} else {
+			v.Bus = "scsi"
+		}
+		warnings = append(warnings, fmt.Sprintf("Bus isn't set, using bus=%s as default", v.Bus))
+	}
+
+	targetDev, err := nextDriveLetter(v.Bus)
+	if v.TargetDev != "" {
+		warnings = append(warnings, fmt.Sprintf(`
+			Setting target_dev for volume is deprecated.
+			Order on the bus now determined by the order of the volume blocks!
+			Please remove the target_dev attribute from the volume definition!
+			Overriding target_dev='%s' to '%s'`, v.TargetDev, targetDev))
+	}
+
+	v.TargetDev = targetDev
+	if err != nil {
+		errs = append(errs, err)
 	}
 
 	if v.Source != nil {
