@@ -1,0 +1,9 @@
+<!-- Code generated from the comments of the FilesVolumeSource struct in builder/libvirt/volume/files.go; DO NOT EDIT MANUALLY -->
+
+Create an image with files local to where packer runs and make it available at boot time.
+Depending on the parent volume's `device` attribute, the result will be a cdrom or a floppy image.
+Use this volume source scarcely, for example when the files needed as early as boot time.
+In general, making local files available on the remote machine is better done with the file provisioner.
+Floppies must not exceed the size 1.44MiB.
+
+<!-- End of code generated from the comments of the FilesVolumeSource struct in builder/libvirt/volume/files.go; -->

@@ -1,0 +1,15 @@
+<!-- Code generated from the comments of the FilesVolumeSource struct in builder/libvirt/volume/files.go; DO NOT EDIT MANUALLY -->
+
+- `files` ([]string) - Files can be either files or directories. An files provided here will
+  be written to the root of the CD or Floppy. Directories will be written to the
+  root of the CD as well, but will retain their subdirectory structure.
+  For a cdrom, the behaviour is the same as `cd_files`. For floppy disks, the behaviour
+  is the same as for `floppy_dirs`!
+
+- `contents` (map[string]string) - Key/Value pairs to add to the CD or Floppy. The keys represent the paths, and the values
+  represent the contents. Can be used together with `files`. If any paths are specified by
+  both, `contents` will take precedence.
+
+- `label` (string) - Label
+
+<!-- End of code generated from the comments of the FilesVolumeSource struct in builder/libvirt/volume/files.go; -->
