@@ -157,15 +157,18 @@ func (*FlatVolume) HCL2Spec() map[string]hcldec.Spec {
 // FlatVolumeSource is an auto-generated flat version of VolumeSource.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatVolumeSource struct {
-	Type          *string  `mapstructure:"type" required:"true" cty:"type" hcl:"type"`
-	Checksum      *string  `mapstructure:"checksum" cty:"checksum" hcl:"checksum"`
-	Urls          []string `mapstructure:"urls" cty:"urls" hcl:"urls"`
-	MetaData      *string  `mapstructure:"meta_data" cty:"meta_data" hcl:"meta_data"`
-	UserData      *string  `mapstructure:"user_data" cty:"user_data" hcl:"user_data"`
-	NetworkConfig *string  `mapstructure:"network_config" cty:"network_config" hcl:"network_config"`
-	Pool          *string  `mapstucture:"pool" required:"false" cty:"pool" hcl:"pool"`
-	Volume        *string  `mapstructure:"volume" required:"false" cty:"volume" hcl:"volume"`
-	Path          *string  `mapstructure:"path" required:"false" cty:"path" hcl:"path"`
+	Type          *string           `mapstructure:"type" required:"true" cty:"type" hcl:"type"`
+	Checksum      *string           `mapstructure:"checksum" cty:"checksum" hcl:"checksum"`
+	Urls          []string          `mapstructure:"urls" cty:"urls" hcl:"urls"`
+	MetaData      *string           `mapstructure:"meta_data" cty:"meta_data" hcl:"meta_data"`
+	UserData      *string           `mapstructure:"user_data" cty:"user_data" hcl:"user_data"`
+	NetworkConfig *string           `mapstructure:"network_config" cty:"network_config" hcl:"network_config"`
+	Pool          *string           `mapstructure:"pool" required:"false" cty:"pool" hcl:"pool"`
+	Volume        *string           `mapstructure:"volume" required:"false" cty:"volume" hcl:"volume"`
+	Path          *string           `mapstructure:"path" required:"false" cty:"path" hcl:"path"`
+	Files         []string          `mapstructure:"files" cty:"files" hcl:"files"`
+	Contents      map[string]string `mapstructure:"contents" cty:"contents" hcl:"contents"`
+	Label         *string           `mapstructure:"label" cty:"label" hcl:"label"`
 }
 
 // FlatMapstructure returns a new FlatVolumeSource.
@@ -189,6 +192,9 @@ func (*FlatVolumeSource) HCL2Spec() map[string]hcldec.Spec {
 		"pool":           &hcldec.AttrSpec{Name: "pool", Type: cty.String, Required: false},
 		"volume":         &hcldec.AttrSpec{Name: "volume", Type: cty.String, Required: false},
 		"path":           &hcldec.AttrSpec{Name: "path", Type: cty.String, Required: false},
+		"files":          &hcldec.AttrSpec{Name: "files", Type: cty.List(cty.String), Required: false},
+		"contents":       &hcldec.AttrSpec{Name: "contents", Type: cty.Map(cty.String), Required: false},
+		"label":          &hcldec.AttrSpec{Name: "label", Type: cty.String, Required: false},
 	}
 	return s
 }

@@ -111,7 +111,7 @@ type Volume struct {
 	// Specifies the volume format type, like `qcow`, `qcow2`, `vmdk`, `raw`. If omitted, the storage pool's default format
 	// will be used.
 	Format string `mapstructure:"format" required:"false"`
-	// Specifies the device type. If omitted, defaults to "disk".
+	// Specifies the device type. If omitted, defaults to "disk". Can be `disk`, `floppy`, `cdrom` or `lun`.
 	Device string `mapstructure:"device" required:"false"`
 
 	allowUnspecifiedSize bool `undocumented:"true"`

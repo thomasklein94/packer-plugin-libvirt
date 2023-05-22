@@ -210,6 +210,44 @@ volume {
 
 ```
 
+#### Files volume source
+
+@include 'builder/libvirt/volume/FilesVolumeSource.mdx'
+@include 'builder/libvirt/volume/FilesVolumeSource-not-required.mdx'
+
+Examples:
+
+* Create a floppy disk for unattended Windows installation *
+```hcl
+volume {
+  alias = "unattend"
+
+  device = "floppy"
+
+  source {
+    type = "files"
+    label = "unattend"
+    contents = {
+      "Unattend.xml" = templatefile("${path.root}/Unattend.xml.tmpl", {ComputerName = "MyMachine"})
+    }
+  }
+}
+```
+
+* Create a CDROM for drivers stored locally
+```hcl
+volume {
+  alias = "drivers"
+  device = "cdrom"
+
+  source {
+    type = "files"
+    label = "drivers"
+    files = ["./drivers/*"]
+  }
+}
+```
+
 ### Network
 Network interfaces can be attached to a builder domain by adding a `network_interface { }` block for each.
 Currently only `managed` and `bridge` networks are supported.
