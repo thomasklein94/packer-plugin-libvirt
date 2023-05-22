@@ -19,7 +19,7 @@ Then, run [`packer init`](https://www.packer.io/docs/commands/init).
 packer {
   required_plugins {
     libvirt = {
-      version = ">= 0.4.6"
+      version = ">= 0.5.0"
       source  = "github.com/thomasklein94/libvirt"
     }
   }
