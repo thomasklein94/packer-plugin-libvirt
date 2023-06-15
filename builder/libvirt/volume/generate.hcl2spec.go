@@ -111,6 +111,33 @@ func (*FlatExternalVolumeSource) HCL2Spec() map[string]hcldec.Spec {
 	return s
 }
 
+// FlatFilesVolumeSource is an auto-generated flat version of FilesVolumeSource.
+// Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
+type FlatFilesVolumeSource struct {
+	Files    []string          `mapstructure:"files" cty:"files" hcl:"files"`
+	Contents map[string]string `mapstructure:"contents" cty:"contents" hcl:"contents"`
+	Label    *string           `mapstructure:"label" cty:"label" hcl:"label"`
+}
+
+// FlatMapstructure returns a new FlatFilesVolumeSource.
+// FlatFilesVolumeSource is an auto-generated flat version of FilesVolumeSource.
+// Where the contents a fields with a `mapstructure:,squash` tag are bubbled up.
+func (*FilesVolumeSource) FlatMapstructure() interface{ HCL2Spec() map[string]hcldec.Spec } {
+	return new(FlatFilesVolumeSource)
+}
+
+// HCL2Spec returns the hcl spec of a FilesVolumeSource.
+// This spec is used by HCL to read the fields of FilesVolumeSource.
+// The decoded values from this spec will then be applied to a FlatFilesVolumeSource.
+func (*FlatFilesVolumeSource) HCL2Spec() map[string]hcldec.Spec {
+	s := map[string]hcldec.Spec{
+		"files":    &hcldec.AttrSpec{Name: "files", Type: cty.List(cty.String), Required: false},
+		"contents": &hcldec.AttrSpec{Name: "contents", Type: cty.Map(cty.String), Required: false},
+		"label":    &hcldec.AttrSpec{Name: "label", Type: cty.String, Required: false},
+	}
+	return s
+}
+
 // FlatVolume is an auto-generated flat version of Volume.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatVolume struct {
