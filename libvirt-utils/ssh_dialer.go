@@ -90,47 +90,47 @@ func sshSetAddress(uri LibvirtUri, dialer *SshDialer) error {
 }
 
 func sshDialerSetPrivateKey(uri LibvirtUri, dialer *SshDialer) (err error) {
-        sock, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK"))
-        if err != nil {
-                return err
-        }
+	sock, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK"))
+	if err != nil {
+		return err
+	}
 
-        agent := agent.NewClient(sock)
+	agent := agent.NewClient(sock)
 
-        signers, err := agent.Signers()
-        if err != nil {
-                return err
-        }
+	signers, err := agent.Signers()
+	if err != nil {
+		return err
+	}
 
-        auths := []ssh.AuthMethod{ssh.PublicKeys(signers...)}
+	auths := []ssh.AuthMethod{ssh.PublicKeys(signers...)}
 
-        dialer.sshConfig.Auth = append(dialer.sshConfig.Auth, auths...)
+	dialer.sshConfig.Auth = append(dialer.sshConfig.Auth, auths...)
 
-        keyPath, ok := uri.GetExtra(LibvirtUriParam_Keyfile)
-        if ok {
-                expandedKeyPath, err := pathing.ExpandUser(keyPath)
+	keyPath, ok := uri.GetExtra(LibvirtUriParam_Keyfile)
+	if ok {
+		expandedKeyPath, err := pathing.ExpandUser(keyPath)
 
-                if err != nil {
-                        return err
-                }
+		if err != nil {
+			return err
+		}
 
-                key, err := ioutil.ReadFile(expandedKeyPath)
+		key, err := ioutil.ReadFile(expandedKeyPath)
 
-                if err != nil {
-                        return err
-                }
+		if err != nil {
+			return err
+		}
 
-                parsedKey, err := ssh.ParsePrivateKey(key)
+		parsedKey, err := ssh.ParsePrivateKey(key)
 
-                if err != nil {
-                        return err
-                }
+		if err != nil {
+			return err
+		}
 
-                dialer.sshConfig.Auth = append(dialer.sshConfig.Auth, ssh.PublicKeys(parsedKey))
+		dialer.sshConfig.Auth = append(dialer.sshConfig.Auth, ssh.PublicKeys(parsedKey))
 
-        }
+	}
 
-        return
+	return
 }
 
 func sshDialerSetVerification(uri LibvirtUri, dialer *SshDialer) error {
