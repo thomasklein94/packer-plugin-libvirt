@@ -24,6 +24,7 @@ type NetworkInterface struct {
 	Model string `mapstructure:"model" required:"false"`
 
 	Bridge  BridgeNetworkInterface  `mapstructure:",squash"`
+	Direct  DirectNetworkInterface  `mapstructure:",squash"`
 	Managed ManagedNetworkInterface `mapstructure:",squash"`
 }
 
@@ -44,6 +45,8 @@ func (ni *NetworkInterface) PrepareConfig(ctx *interpolate.Context) (warnings []
 	switch ni.Type {
 	case "managed", "network":
 		w, e = ni.Managed.PrepareConfig(ctx)
+	case "direct":
+		w, e = ni.Direct.PrepareConfig(ctx)
 	case "bridge":
 		w, e = ni.Bridge.PrepareConfig(ctx)
 	default:
@@ -74,6 +77,8 @@ func (ni NetworkInterface) DomainInterface() *libvirtxml.DomainInterface {
 	}
 
 	switch ni.Type {
+	case "direct":
+		ni.Direct.UpdateDomainInterface(&domainInterface)
 	case "bridge":
 		ni.Bridge.UpdateDomainInterface(&domainInterface)
 	case "managed":

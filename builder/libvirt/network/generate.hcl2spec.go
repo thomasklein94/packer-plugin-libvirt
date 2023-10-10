@@ -16,6 +16,8 @@ type FlatNetworkInterface struct {
 	Model   *string `mapstructure:"model" required:"false" cty:"model" hcl:"model"`
 	Bridge  *string `mapstructure:"bridge" required:"false" cty:"bridge" hcl:"bridge"`
 	Network *string `mapstructure:"network" required:"false" cty:"network" hcl:"network"`
+	Mode  *string `mapstructure:"mode" required:"false" cty:"mode" hcl:"mode"`
+	Dev  *string `mapstructure:"dev" required:"false" cty:"dev" hcl:"dev"`
 }
 
 // FlatMapstructure returns a new FlatNetworkInterface.
@@ -36,6 +38,8 @@ func (*FlatNetworkInterface) HCL2Spec() map[string]hcldec.Spec {
 		"model":   &hcldec.AttrSpec{Name: "model", Type: cty.String, Required: false},
 		"bridge":  &hcldec.AttrSpec{Name: "bridge", Type: cty.String, Required: false},
 		"network": &hcldec.AttrSpec{Name: "network", Type: cty.String, Required: false},
+		"mode":  &hcldec.AttrSpec{Name: "mode", Type: cty.String, Required: false},
+		"dev":  &hcldec.AttrSpec{Name: "dev", Type: cty.String, Required: false},
 	}
 	return s
 }
