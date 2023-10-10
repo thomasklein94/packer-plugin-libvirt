@@ -10,12 +10,14 @@ import (
 // FlatNetworkInterface is an auto-generated flat version of NetworkInterface.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatNetworkInterface struct {
-	Type    *string `mapstructure:"type" required:"true" cty:"type" hcl:"type"`
-	Mac     *string `mapstructure:"mac" required:"false" cty:"mac" hcl:"mac"`
-	Alias   *string `mapstructure:"alias" required:"false" cty:"alias" hcl:"alias"`
-	Model   *string `mapstructure:"model" required:"false" cty:"model" hcl:"model"`
-	Bridge  *string `mapstructure:"bridge" required:"false" cty:"bridge" hcl:"bridge"`
-	Network *string `mapstructure:"network" required:"false" cty:"network" hcl:"network"`
+        Type    *string `mapstructure:"type" required:"true" cty:"type" hcl:"type"`
+        Mac     *string `mapstructure:"mac" required:"false" cty:"mac" hcl:"mac"`
+        Alias   *string `mapstructure:"alias" required:"false" cty:"alias" hcl:"alias"`
+        Model   *string `mapstructure:"model" required:"false" cty:"model" hcl:"model"`
+        Bridge  *string `mapstructure:"bridge" required:"false" cty:"bridge" hcl:"bridge"`
+        Network *string `mapstructure:"network" required:"false" cty:"network" hcl:"network"`
+        Mode  *string `mapstructure:"mode" required:"false" cty:"mode" hcl:"mode"`
+        Dev  *string `mapstructure:"dev" required:"false" cty:"dev" hcl:"dev"`
 }
 
 // FlatMapstructure returns a new FlatNetworkInterface.
@@ -29,13 +31,15 @@ func (*NetworkInterface) FlatMapstructure() interface{ HCL2Spec() map[string]hcl
 // This spec is used by HCL to read the fields of NetworkInterface.
 // The decoded values from this spec will then be applied to a FlatNetworkInterface.
 func (*FlatNetworkInterface) HCL2Spec() map[string]hcldec.Spec {
-	s := map[string]hcldec.Spec{
-		"type":    &hcldec.AttrSpec{Name: "type", Type: cty.String, Required: false},
-		"mac":     &hcldec.AttrSpec{Name: "mac", Type: cty.String, Required: false},
-		"alias":   &hcldec.AttrSpec{Name: "alias", Type: cty.String, Required: false},
-		"model":   &hcldec.AttrSpec{Name: "model", Type: cty.String, Required: false},
-		"bridge":  &hcldec.AttrSpec{Name: "bridge", Type: cty.String, Required: false},
-		"network": &hcldec.AttrSpec{Name: "network", Type: cty.String, Required: false},
-	}
-	return s
+        s := map[string]hcldec.Spec{
+                "type":    &hcldec.AttrSpec{Name: "type", Type: cty.String, Required: false},
+                "mac":     &hcldec.AttrSpec{Name: "mac", Type: cty.String, Required: false},
+                "alias":   &hcldec.AttrSpec{Name: "alias", Type: cty.String, Required: false},
+                "model":   &hcldec.AttrSpec{Name: "model", Type: cty.String, Required: false},
+                "bridge":  &hcldec.AttrSpec{Name: "bridge", Type: cty.String, Required: false},
+                "network": &hcldec.AttrSpec{Name: "network", Type: cty.String, Required: false},
+                "mode":  &hcldec.AttrSpec{Name: "mode", Type: cty.String, Required: false},
+                "dev":  &hcldec.AttrSpec{Name: "dev", Type: cty.String, Required: false},
+        }
+        return s
 }
