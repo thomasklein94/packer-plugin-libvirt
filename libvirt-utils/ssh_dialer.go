@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/packer-plugin-sdk/pathing"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
+	"golang.org/x/crypto/ssh/agent"
 )
 
 type SshDialer struct {
@@ -89,33 +90,47 @@ func sshSetAddress(uri LibvirtUri, dialer *SshDialer) error {
 }
 
 func sshDialerSetPrivateKey(uri LibvirtUri, dialer *SshDialer) (err error) {
+        sock, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK"))
+        if err != nil {
+                return err
+        }
 
-	keyPath, ok := uri.GetExtra(LibvirtUriParam_Keyfile)
-	if !ok {
-		return fmt.Errorf("ssh transport requires %s parameter", LibvirtUriParam_Keyfile)
-	}
+        agent := agent.NewClient(sock)
 
-	expandedKeyPath, err := pathing.ExpandUser(keyPath)
+        signers, err := agent.Signers()
+        if err != nil {
+                return err
+        }
 
-	if err != nil {
-		return err
-	}
+        auths := []ssh.AuthMethod{ssh.PublicKeys(signers...)}
 
-	key, err := ioutil.ReadFile(expandedKeyPath)
+        dialer.sshConfig.Auth = append(dialer.sshConfig.Auth, auths...)
 
-	if err != nil {
-		return err
-	}
+        keyPath, ok := uri.GetExtra(LibvirtUriParam_Keyfile)
+        if ok {
+                expandedKeyPath, err := pathing.ExpandUser(keyPath)
 
-	parsedKey, err := ssh.ParsePrivateKey(key)
+                if err != nil {
+                        return err
+                }
 
-	if err != nil {
-		return err
-	}
+                key, err := ioutil.ReadFile(expandedKeyPath)
 
-	dialer.sshConfig.Auth = append(dialer.sshConfig.Auth, ssh.PublicKeys(parsedKey))
+                if err != nil {
+                        return err
+                }
 
-	return
+                parsedKey, err := ssh.ParsePrivateKey(key)
+
+                if err != nil {
+                        return err
+                }
+
+                dialer.sshConfig.Auth = append(dialer.sshConfig.Auth, ssh.PublicKeys(parsedKey))
+
+        }
+
+        return
 }
 
 func sshDialerSetVerification(uri LibvirtUri, dialer *SshDialer) error {
