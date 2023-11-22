@@ -3,7 +3,7 @@
 integration {
   name = "Libvirt"
   description = "TODO"
-  identifier = "packer/BrandonRomano/libvirt"
+  identifier = "packer/thomasklein94/libvirt"
   component {
     type = "builder"
     name = "Libvirt"
