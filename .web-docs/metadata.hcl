@@ -2,7 +2,7 @@
 # https://github.com/hashicorp/integration-template#metadata-configuration
 integration {
   name = "Libvirt"
-  description = "TODO"
+  description = "Create Libvirt volumes on your libvirt hypervisor."
   identifier = "packer/thomasklein94/libvirt"
   component {
     type = "builder"
