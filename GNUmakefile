@@ -3,6 +3,7 @@ BINARY=packer-plugin-${NAME}
 
 COUNT?=1
 TEST?=$(shell go list ./...)
+HASHICORP_PACKER_PLUGIN_SDK_VERSION?=$(shell go list -m github.com/hashicorp/packer-plugin-sdk | cut -d " " -f2)
 
 .PHONY: dev
 
@@ -16,6 +17,9 @@ dev: build
 test:
 	@go test -race -count $(COUNT) $(TEST) -timeout=3m
 
+install-packer-sdc: ## Install packer sofware development command
+	@go install github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc@${HASHICORP_PACKER_PLUGIN_SDK_VERSION}
+
 ci-release-docs:
 	@go run github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc renderdocs -src docs -partials docs-partials/ -dst docs/
 	@/bin/sh -c "[ -d docs ] && zip -r docs.zip docs/"
@@ -28,5 +32,8 @@ testacc: dev
 
 generate:
 	@go generate ./...
-	go run github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc renderdocs -src ./docs -dst ./.docs -partials ./docs-partials
+	@if [ -d ".docs" ]; then rm -r ".docs"; fi
+	go run github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc renderdocs -src "docs" -partials docs-partials/ -dst ".docs/"
+	@./.web-docs/scripts/compile-to-webdocs.sh "." ".docs" ".web-docs" "thomasklein94"
+	@rm -r ".docs"
 	# checkout the .docs folder for a preview of the docs

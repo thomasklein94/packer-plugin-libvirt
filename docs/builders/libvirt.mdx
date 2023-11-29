@@ -22,7 +22,7 @@ Before looking at the configuration options and examples, you might also want to
 familiarize yourself with [libvirt's domain specification](https://libvirt.org/formatdomain.html)
 and [libvirt's storage pool and volume concepts](https://libvirt.org/formatstorage.html).
 
-### Installation
+## Installation
 
 To use the pre-built release of Packer Plugin Libvirt, you can add the following snippet to your Packer project:
 
@@ -39,15 +39,15 @@ packer {
 
 <!-- Builder Configuration Fields -->
 
-### Required
+## Required
 
 @include 'builder/libvirt/Config-required.mdx'
 
-### Optional
+## Optional
 
 @include 'builder/libvirt/Config-not-required.mdx'
 
-### Aliases
+## Aliases
 Libvirt offers a way to add one alias per device. Libvirt builder uses this to find out which volume should be the
 artifact in case there are multiple volume configurations present. Finding the communicator interface is similar in fashion.
 There are reasonable defaults built into the builder to ease onboarding but they will produce a warning and it's 
@@ -57,13 +57,13 @@ The identifier must consist only of the following characters: `[a-zA-Z0-9_-]`. L
 to start with `ua-`, but libvirt builder will take care of that for you and prepend every alias with `ua-` before 
 applying the domain definition to libvirt.
 
-### Graceful shutdown
+## Graceful shutdown
 To ensure all changes were synced to the artifact volume,
 after a **successful provisioning**, the Libvirt plugin will try to gracefully terminate the builder instance
 by sending a shutdown command to libvirt and wait up to `shutdown_timeout` before forcefully destroys the domain.
 Libvirt supports multiple way to shut down a domain, which can be controlled by the `shutdown_mode` attribute.
 
-### Volumes
+## Volumes
 
 Libvirt uses volumes to attach as disks, to boot from and to persist data to. Libvirt Builder treats volumes as sources
 and possible artifacts. Arbitrary number of volumes can be attached to a builder domain with specifying a `volume { }` 
@@ -78,7 +78,7 @@ the volume must exists before the build, and will not be destroyed at the end of
 
 @include 'builder/libvirt/volume/Volume-not-required.mdx'
 
-#### Backing-store volume source
+## Backing-store volume source
 Backing-store source instructs libvirt to use an already presented volume as a base for this volume.
 
 @include 'builder/libvirt/volume/BackingStoreVolumeSource-not-required.mdx'
@@ -103,7 +103,7 @@ volume {
 }
 ```
 
-#### Cloning a volume
+## Cloning a volume
 If you wish to clone a volume instead of using a backing store overlay described above,
 You have the option to use the `cloning` source type.
 
@@ -128,7 +128,7 @@ volume {
 }
 ```
 
-#### Cloud-init volume source
+## Cloud-init volume source
 Linux domains running in a libvirt environment can be set up with the 
 [NoCloud cloud-init datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html).
 This means a small ISO image with the label `CIDATA` will be assembled at the machine running packer and will be uploaded to the volume.
@@ -180,7 +180,7 @@ volume {
 }
 ```
 
-#### External volume source
+## External volume source
 
 @include 'builder/libvirt/volume/ExternalVolumeSource.mdx'
 @include 'builder/libvirt/volume/ExternalVolumeSource-not-required.mdx'
@@ -210,7 +210,7 @@ volume {
 
 ```
 
-#### Files volume source
+## Files volume source
 
 @include 'builder/libvirt/volume/FilesVolumeSource.mdx'
 @include 'builder/libvirt/volume/FilesVolumeSource-not-required.mdx'
@@ -248,14 +248,14 @@ volume {
 }
 ```
 
-### Network
+## Network
 Network interfaces can be attached to a builder domain by adding a `network_interface { }` block for each.
 Currently only `managed` and `bridge` networks are supported.
 
 @include 'builder/libvirt/network/NetworkInterface-required.mdx'
 @include 'builder/libvirt/network/NetworkInterface-not-required.mdx'
 
-#### Communicators and network interfaces
+## Communicators and network interfaces
 If an SSH or WinRM address is specified in the communicator block, packer will use that address to communicate with the
 builder domain.
 
@@ -293,7 +293,7 @@ network_interface {
 }
 ```
 
-### Graphics and video, headless domains
+## Graphics and video, headless domains
 Libvirt builder creates a headless domain by default with no video card or monitor attached to it. Most linux distributions
 and cloud images are fine with this setup, but you might need to add a video card and a graphical interface to your machine.
 
@@ -306,7 +306,7 @@ Currently, there is no option to specify or customize just a video device for a 
 @include 'builder/libvirt/SdlDomainGraphic-not-required.mdx'
 @include 'builder/libvirt/VNCDomainGraphic-not-required.mdx'
 
-### Debugging a build
+## Debugging a build
 By default, Libvirt builder assigns two serial console to the domain with the aliases `serial-console` and `virtual-console`.
 You can use your virtual manager to connect to one of these consoles for debug.
 
@@ -315,7 +315,7 @@ variable to packer simultaneously while setting the `PACKER_LIBVIRT_STREAM_CONSO
 the builder will connect to that console and logs any message the domain sends to that console.
 In no way, shape or form should this be used in any production or serious setup!
 
-### A simple builder definition example
+## A simple builder definition example
 
 The following example will download and then upload an ubuntu cloud image to the default storage pool, then starts a
 libvirt domain accessing the default libvirt network. Additionally, the example will create an SSH key and add 
