@@ -25,6 +25,7 @@ type NetworkInterface struct {
 
 	Bridge  BridgeNetworkInterface  `mapstructure:",squash"`
 	Managed ManagedNetworkInterface `mapstructure:",squash"`
+	User UserNetworkInterface `mapstructure:",squash"`
 }
 
 func (ni *NetworkInterface) PrepareConfig(ctx *interpolate.Context) (warnings []string, errs []error) {
@@ -46,6 +47,8 @@ func (ni *NetworkInterface) PrepareConfig(ctx *interpolate.Context) (warnings []
 		w, e = ni.Managed.PrepareConfig(ctx)
 	case "bridge":
 		w, e = ni.Bridge.PrepareConfig(ctx)
+	case "user":
+		w, e = ni.User.PrepareConfig(ctx)
 	default:
 		errs = append(errs, fmt.Errorf("unsupported network interface type '%s'", ni.Type))
 		return
@@ -78,6 +81,8 @@ func (ni NetworkInterface) DomainInterface() *libvirtxml.DomainInterface {
 		ni.Bridge.UpdateDomainInterface(&domainInterface)
 	case "managed":
 		ni.Managed.UpdateDomainInterface(&domainInterface)
+	case "user":
+		ni.User.UpdateDomainInterface(&domainInterface)
 	}
 
 	return &domainInterface

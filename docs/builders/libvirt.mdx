@@ -250,7 +250,7 @@ volume {
 
 ### Network
 Network interfaces can be attached to a builder domain by adding a `network_interface { }` block for each.
-Currently only `managed` and `bridge` networks are supported.
+Currently only `managed`, `bridge`, and `user` networks are supported.
 
 @include 'builder/libvirt/network/NetworkInterface-required.mdx'
 @include 'builder/libvirt/network/NetworkInterface-not-required.mdx'
@@ -290,6 +290,13 @@ For connecting to a bridge
 network_interface {
   type   = "bridge"
   bridge = "br0"
+}
+```
+
+For usermode networking
+```hcl
+network_interface {
+  type   = "user"
 }
 ```
 
